@@ -1,4 +1,9 @@
-const sequelize = require('../config/database');
-const Pet = require('./pet');
+const sequelize = require("../config/database");
+const Pet = require("./pet");
+const User = require("./user");
 
-module.exports = { sequelize, Pet };
+module.exports = {
+  sequelize,
+  Pet,
+  User,
+};
