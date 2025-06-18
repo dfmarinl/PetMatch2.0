@@ -1,5 +1,7 @@
 const { User } = require("../../../../../models");
 
+const bcrypt = require("bcrypt"); // asegúrate de que esté importado arriba
+
 const createUser = async (req, res) => {
   try {
     const {
@@ -10,6 +12,8 @@ const createUser = async (req, res) => {
       email,
       password,
       rol,
+      city,
+      direction,
     } = req.body;
 
     if (
@@ -18,7 +22,9 @@ const createUser = async (req, res) => {
       !identificationNumber ||
       !age ||
       !email ||
-      !password
+      !password ||
+      !city ||
+      !direction
     ) {
       return res.status(400).json({ message: "Faltan campos obligatorios." });
     }
@@ -28,14 +34,19 @@ const createUser = async (req, res) => {
       return res.status(400).json({ message: "El email ya está registrado." });
     }
 
+    // Encriptar contraseña antes de guardar
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     const newUser = await User.create({
       firstName,
       lastName,
       identificationNumber,
       age,
       email,
-      password,
+      password: hashedPassword,
       rol,
+      city,
+      direction,
     });
 
     const { password: _, ...userWithoutPassword } = newUser.toJSON();
