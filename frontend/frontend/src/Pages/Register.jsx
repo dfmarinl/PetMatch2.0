@@ -4,6 +4,7 @@ import { useAuth } from '../App';
 import AuthLayout from '../components/auth/AuthLayout';
 import RegisterForm from '../components/auth/RegisterForm';
 import Button from '../components/ui/Button';
+import { registerRequest } from '../api/auth'; // 👈 importa la función real
 
 const Register = () => {
   const [loading, setLoading] = useState(false);
@@ -13,29 +14,12 @@ const Register = () => {
   const handleRegister = async (formData) => {
     setLoading(true);
     try {
-      // Simular llamada a API
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      console.log('Register data:', formData);
-      
-      // Aquí harías la llamada real a tu API
-      // const response = await fetch('/api/auth/register', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(formData)
-      // });
-      
-      // Simular respuesta exitosa
-      const userData = {
-        id: 1,
-        name: formData.name,
-        email: formData.email
-      };
-      
-      login(userData);
+      const response = await registerRequest(formData); // llamada real
+      login(response.user); // guarda usuario en contexto
       navigate('/dashboard');
     } catch (error) {
-      console.error('Error:', error);
-      alert('Error al crear la cuenta');
+      console.error('Error al registrar:', error);
+      alert(error.message);
     } finally {
       setLoading(false);
     }
