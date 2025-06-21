@@ -4,6 +4,7 @@ import { useAuth } from '../App';
 import AuthLayout from '../components/auth/AuthLayout';
 import LoginForm from '../components/auth/LoginForm';
 import Button from '../components/ui/Button';
+import { loginRequest } from '../api/auth'; // <-- importa la función
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
@@ -13,29 +14,16 @@ const Login = () => {
   const handleLogin = async (formData) => {
     setLoading(true);
     try {
-      // Simular llamada a API
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      console.log('Login data:', formData);
-      
-      // Aquí harías la llamada real a tu API
-      // const response = await fetch('/api/auth/login', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(formData)
-      // });
-      
-      // Simular respuesta exitosa
-      const userData = {
-        id: 1,
-        name: 'Usuario Demo',
-        email: formData.email
-      };
-      
-      login(userData);
+      const { user } = await loginRequest(formData.email, formData.password);
+
+      // Guardar usuario en contexto o estado global
+      login(user);
+
+      // Redirigir
       navigate('/dashboard');
     } catch (error) {
       console.error('Error:', error);
-      alert('Error al iniciar sesión');
+      alert(error.message || 'Error al iniciar sesión');
     } finally {
       setLoading(false);
     }
@@ -61,8 +49,7 @@ const Login = () => {
         <div className="mt-6">
           <Button
             variant="outline"
-            className="w-full  text-white bg-blue-600 hover:bg-blue-700"
-            
+            className="w-full text-white bg-blue-600 hover:bg-blue-700"
             onClick={() => navigate('/register')}
           >
             Crear una cuenta nueva
