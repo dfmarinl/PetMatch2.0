@@ -1,6 +1,6 @@
 const { User } = require("../../../../../models");
 
-const bcrypt = require("bcrypt"); // asegúrate de que esté importado arriba
+const bcrypt = require("bcrypt");
 
 const createUser = async (req, res) => {
   try {
