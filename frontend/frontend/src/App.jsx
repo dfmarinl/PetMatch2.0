@@ -4,6 +4,9 @@ import LandingPage from './Pages/LandingPage';
 import Login from './Pages/Login';
 import Register from './Pages/Register';
 import Dashboard from './Pages/Dashboard';
+import AdminDashboard from './Pages/AdminDashboard';
+import PetRegistration from './Pages/PetRegistration';
+
 
 // Context para manejar el estado del usuario
 const AuthContext = createContext();
@@ -36,6 +39,8 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/pets/new" element={<PetRegistration />} />
           </Routes>
         </div>
       </Router>
