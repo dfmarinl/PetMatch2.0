@@ -87,9 +87,12 @@ const LandingPage = () => {
               <Link to="/register" className="bg-primary-500 text-black px-8 py-4 rounded-lg text-lg font-medium hover:bg-primary-600/90 transition-all transform hover:-translate-y-1 hover:shadow-lg inline-flex items-center justify-center">
                 Comenzar Adopción <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
-              <a href="#mascotas" className="border border-primary-500 text-primary-500 px-8 py-4 rounded-lg text-lg font-medium hover:bg-primary-100/60 inline-flex items-center justify-center">
+               <Link
+                to="/pets"
+                className="border border-primary-500 text-primary-500 px-8 py-4 rounded-lg text-lg font-medium hover:bg-primary-50 transition-colors inline-flex items-center justify-center"
+              >
                 Ver Mascotas
-              </a>
+              </Link>
             </div>
           </div>
         </section>

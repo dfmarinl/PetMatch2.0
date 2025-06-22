@@ -16,6 +16,8 @@ export const uploadPetImage = async (file) => {
       formData
     );
     return response.data.secure_url;
+    
+
   } catch (error) {
     console.error("Error al subir la imagen a Cloudinary:", error);
     throw error;
