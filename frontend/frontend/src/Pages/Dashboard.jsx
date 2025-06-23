@@ -1,13 +1,16 @@
 import { useAuth } from "../App";
 import { useNavigate } from "react-router-dom";
-import { Heart, User, LogOut, Search, Filter } from "lucide-react";
+import { Heart, User, LogOut } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getAllPets } from "../api/pet";
+import { getMeRequest } from "../api/auth";
 import PetDetailsModal from "../components/Modales/PetDetailsModal";
+import AdoptionRequestModal from "../components/Modales/AdoptionRequestModal";
 
 const Dashboard = () => {
   const { user, logout, token } = useAuth();
   const navigate = useNavigate();
+
   const [pets, setPets] = useState([]);
   const [filteredPets, setFilteredPets] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -17,6 +20,11 @@ const Dashboard = () => {
 
   const [selectedPet, setSelectedPet] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [isAdoptionModalOpen, setIsAdoptionModalOpen] = useState(false);
+  const [petToAdopt, setPetToAdopt] = useState(null);
+
+  const [userData, setUserData] = useState(null);
 
   const openModal = (pet) => {
     setSelectedPet(pet);
@@ -28,23 +36,39 @@ const Dashboard = () => {
     setIsModalOpen(false);
   };
 
+  const openAdoptionModal = (pet) => {
+    setPetToAdopt(pet);
+    setIsAdoptionModalOpen(true);
+  };
+
+  const closeAdoptionModal = () => {
+    setPetToAdopt(null);
+    setIsAdoptionModalOpen(false);
+  };
+
   const handleLogout = () => {
     logout();
     navigate("/");
   };
 
+  const hasSentRequest = (petId) => {
+    return userData?.AdoptionRequests?.some((req) => req.petId === petId);
+  };
+
   useEffect(() => {
-    const fetchPets = async () => {
+    const fetchPetsAndUser = async () => {
       try {
-        const data = await getAllPets(token);
-        setPets(data);
-        setFilteredPets(data);
+        const petsData = await getAllPets(token);
+        const userInfo = await getMeRequest(token);
+        setPets(petsData);
+        setFilteredPets(petsData);
+        setUserData(userInfo);
       } catch (error) {
-        console.error("Error al obtener mascotas:", error);
+        console.error("Error cargando datos:", error);
       }
     };
 
-    fetchPets();
+    fetchPetsAndUser();
   }, [token]);
 
   useEffect(() => {
@@ -87,10 +111,6 @@ const Dashboard = () => {
     setSelectedAge("");
   };
 
-  const getGenderLabel = (gender) => {
-    return gender === "male" ? "Macho" : "Hembra";
-  };
-
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -130,107 +150,60 @@ const Dashboard = () => {
         </div>
       </header>
 
+      {/* Main */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            ¡Bienvenido(a), {user?.firstName || "Usuario"}!
-          </h1>
-          <p className="text-gray-600">
-            Explora nuestras mascotas disponibles y encuentra a tu compañero
-            perfecto.
-          </p>
-        </div>
+        {/* Filtros */}
+        <div className="mb-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <input
+            type="text"
+            placeholder="Buscar por nombre, raza o descripción"
+            className="px-4 py-2 border border-gray-300 rounded-lg"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
 
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-            <div className="lg:col-span-2 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <input
-                type="text"
-                placeholder="Buscar por nombre, raza..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              />
-            </div>
-            <select
-              value={selectedSpecies}
-              onChange={(e) => setSelectedSpecies(e.target.value)}
-              className="py-3 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            >
-              <option value="">Todas las especies</option>
-              <option value="Perro">Perros</option>
-              <option value="Gato">Gatos</option>
-              <option value="Conejo">Conejos</option>
-              <option value="Ave">Aves</option>
-            </select>
-            <select
-              value={selectedGender}
-              onChange={(e) => setSelectedGender(e.target.value)}
-              className="py-3 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            >
-              <option value="">Todos los géneros</option>
-              <option value="male">Machos</option>
-              <option value="female">Hembras</option>
-            </select>
-            <select
-              value={selectedAge}
-              onChange={(e) => setSelectedAge(e.target.value)}
-              className="py-3 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            >
-              <option value="">Todas las edades</option>
-              <option value="young">Jóvenes (0-2 años)</option>
-              <option value="adult">Adultos (3-6 años)</option>
-              <option value="senior">Seniors (7+ años)</option>
-            </select>
-          </div>
+          <select
+            className="px-4 py-2 border border-gray-300 rounded-lg"
+            value={selectedSpecies}
+            onChange={(e) => setSelectedSpecies(e.target.value)}
+          >
+            <option value="">Todas las especies</option>
+            <option value="Perro">Perro</option>
+            <option value="Gato">Gato</option>
+          </select>
 
-          {(searchTerm || selectedSpecies || selectedGender || selectedAge) && (
-            <div className="mt-4 flex items-center justify-between">
-              <div className="flex flex-wrap gap-2">
-                {searchTerm && (
-                  <span className="bg-primary-100 text-primary-700 px-3 py-1 rounded-full text-sm">
-                    Búsqueda: "{searchTerm}"
-                  </span>
-                )}
-                {selectedSpecies && (
-                  <span className="bg-primary-100 text-primary-700 px-3 py-1 rounded-full text-sm">
-                    Especie: {selectedSpecies}
-                  </span>
-                )}
-                {selectedGender && (
-                  <span className="bg-primary-100 text-primary-700 px-3 py-1 rounded-full text-sm">
-                    Género: {getGenderLabel(selectedGender)}
-                  </span>
-                )}
-                {selectedAge && (
-                  <span className="bg-primary-100 text-primary-700 px-3 py-1 rounded-full text-sm">
-                    Edad:{" "}
-                    {selectedAge === "young"
-                      ? "Jóvenes"
-                      : selectedAge === "adult"
-                      ? "Adultos"
-                      : "Seniors"}
-                  </span>
-                )}
-                
-              </div>
-              <button
-                onClick={clearFilters}
-                className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
-              >
-                Limpiar filtros
-              </button>
-            </div>
-          )}
+          <select
+            className="px-4 py-2 border border-gray-300 rounded-lg"
+            value={selectedGender}
+            onChange={(e) => setSelectedGender(e.target.value)}
+          >
+            <option value="">Todos los géneros</option>
+            <option value="male">Macho</option>
+            <option value="female">Hembra</option>
+          </select>
+
+          <select
+            className="px-4 py-2 border border-gray-300 rounded-lg"
+            value={selectedAge}
+            onChange={(e) => setSelectedAge(e.target.value)}
+          >
+            <option value="">Todas las edades</option>
+            <option value="young">Joven (≤2 años)</option>
+            <option value="adult">Adulto (3-6 años)</option>
+            <option value="senior">Mayor (>6 años)</option>
+          </select>
         </div>
 
         <div className="mb-6">
-          <p className="text-gray-600">
-            Mostrando {filteredPets.length} de {pets.length} mascotas
-          </p>
+          <button
+            onClick={clearFilters}
+            className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300"
+          >
+            Limpiar Filtros
+          </button>
         </div>
 
+        {/* Lista de mascotas */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredPets.map((pet) => (
             <div
@@ -262,22 +235,44 @@ const Dashboard = () => {
                   >
                     Ver Detalles
                   </button>
-
-                  <button className="flex-1 bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition-colors">
-                    Adoptar
-                  </button>
+                  {!pet.available ? (
+                    <span className="flex-1 text-center bg-red-100 text-red-600 py-2 px-4 rounded-lg cursor-not-allowed">
+                      Ya adoptado
+                    </span>
+                  ) : hasSentRequest(pet.id) ? (
+                    <span className="flex-1 text-center bg-yellow-100 text-yellow-600 py-2 px-4 rounded-lg cursor-not-allowed">
+                      Ya enviaste solicitud
+                    </span>
+                  ) : (
+                    <button
+                      onClick={() => openAdoptionModal(pet)}
+                      className="flex-1 bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition-colors"
+                    >
+                      Adoptar
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
           ))}
         </div>
       </main>
+
+      {/* Modales */}
       <PetDetailsModal
         isOpen={isModalOpen}
         onClose={closeModal}
         pet={selectedPet}
       />
 
+      <AdoptionRequestModal
+        isOpen={isAdoptionModalOpen}
+        onClose={closeAdoptionModal}
+        pet={petToAdopt}
+        user={user}
+      />
+
+      {/* Footer */}
       <footer className="bg-white border-t shadow-sm py-4 mt-auto">
         <div className="max-w-7xl mx-auto px-4 text-center text-sm text-gray-500">
           © 2025 PetMatch. Todos los derechos reservados. Desarrollado por el
@@ -289,3 +284,6 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
+
+
