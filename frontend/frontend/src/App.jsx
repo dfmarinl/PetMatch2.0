@@ -1,14 +1,13 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { useState, createContext, useContext } from 'react';
-import LandingPage from './Pages/LandingPage';
-import Login from './Pages/Login';
-import Register from './Pages/Register';
-import Dashboard from './Pages/Dashboard';
-import AdminDashboard from './Pages/AdminDashboard';
-import PetRegistration from './Pages/PetRegistration';
-import PetsCatalog from './Pages/PetsCatalog';
-
-
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { useState, createContext, useContext } from "react";
+import LandingPage from "./Pages/LandingPage";
+import Login from "./Pages/Login";
+import Register from "./Pages/Register";
+import Dashboard from "./Pages/Dashboard";
+import AdminDashboard from "./Pages/AdminDashboard";
+import PetRegistration from "./Pages/PetRegistration";
+import PetsCatalog from "./Pages/PetsCatalog";
+import ClientProfile from "./pages/ClientProfile";
 
 // Context para manejar el estado del usuario
 const AuthContext = createContext();
@@ -16,7 +15,7 @@ const AuthContext = createContext();
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth debe ser usado dentro de AuthProvider');
+    throw new Error("useAuth debe ser usado dentro de AuthProvider");
   }
   return context;
 };
@@ -44,6 +43,7 @@ function App() {
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/pets/new" element={<PetRegistration />} />
             <Route path="/pets" element={<PetsCatalog />} />
+            <Route path="/profile" element={<ClientProfile />} />
           </Routes>
         </div>
       </Router>
