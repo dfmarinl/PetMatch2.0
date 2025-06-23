@@ -2,6 +2,7 @@ const {
   AdoptionRequest,
   Pet,
   CompletedAdoption,
+  User,
 } = require("../../../../../models");
 
 //Crear solicitud de adopción
@@ -114,6 +115,7 @@ const updateAdoptionRequestStatus = async (req, res) => {
   }
 };
 
+//obtener todas las solicitudes
 const getAllRequests = async (req, res) => {
   try {
     const requests = await AdoptionRequest.findAll({
@@ -168,7 +170,7 @@ const getRequestsByUser = async (req, res) => {
   }
 };
 
-//Obtener todas las coilictudes de un usuario
+//Obtener todas las adopciones de un usuario
 const getCompletedAdoptionsByUser = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -258,6 +260,132 @@ const getRequestsPaginated = async (req, res) => {
   }
 };
 
+//Obtener todas las adopciones completadas
+const getAllCompletedAdoptions = async (req, res) => {
+  try {
+    const completedAdoptions = await CompletedAdoption.findAll({
+      include: [
+        {
+          model: AdoptionRequest,
+          include: [
+            {
+              model: User,
+              attributes: [
+                "id",
+                "firstName",
+                "lastName",
+                "identificationNumber",
+                "email",
+              ],
+            },
+            {
+              model: Pet,
+              attributes: ["id", "name", "species", "breed", "image"],
+            },
+          ],
+        },
+      ],
+      order: [["deliveryDate", "DESC"]],
+    });
+
+    res.status(200).json(completedAdoptions);
+  } catch (error) {
+    console.error("Error al obtener adopciones completadas:", error);
+    res.status(500).json({
+      message: "Error al obtener adopciones completadas: " + error.message,
+    });
+  }
+};
+
+//Obtener todas las adopciones completadas paginadas
+const getCompletedAdoptionsPaginated = async (req, res) => {
+  try {
+    const { page = 1, limit = 10 } = req.query;
+    const offset = (page - 1) * limit;
+
+    const { count, rows: completedAdoptions } =
+      await CompletedAdoption.findAndCountAll({
+        offset: parseInt(offset),
+        limit: parseInt(limit),
+        order: [["deliveryDate", "DESC"]],
+        include: [
+          {
+            model: AdoptionRequest,
+            include: [
+              {
+                model: User,
+                attributes: [
+                  "id",
+                  "firstName",
+                  "lastName",
+                  "identificationNumber",
+                  "email",
+                ],
+              },
+              {
+                model: Pet,
+                attributes: ["id", "name", "species", "breed", "image"],
+              },
+            ],
+          },
+        ],
+      });
+
+    res.status(200).json({
+      completedAdoptions,
+      total: count,
+      totalPages: Math.ceil(count / limit),
+      currentPage: parseInt(page),
+    });
+  } catch (error) {
+    console.error("Error al obtener adopciones paginadas:", error);
+    res.status(500).json({
+      message:
+        "Error al obtener adopciones completadas paginadas: " + error.message,
+    });
+  }
+};
+
+const getCompletedAdoptionsByUserId = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const completedAdoptions = await CompletedAdoption.findAll({
+      include: [
+        {
+          model: AdoptionRequest,
+          where: { userId },
+          include: [
+            {
+              model: User,
+              attributes: [
+                "id",
+                "firstName",
+                "lastName",
+                "identificationNumber",
+                "email",
+              ],
+            },
+            {
+              model: Pet,
+              attributes: ["id", "name", "species", "breed", "image"],
+            },
+          ],
+        },
+      ],
+      order: [["deliveryDate", "DESC"]],
+    });
+
+    res.status(200).json(completedAdoptions);
+  } catch (error) {
+    console.error("Error al obtener adopciones por usuario:", error);
+    res.status(500).json({
+      message:
+        "Error al obtener adopciones completadas del usuario: " + error.message,
+    });
+  }
+};
+
 module.exports = {
   createAdoptionRequest,
   updateAdoptionRequestStatus,
@@ -266,4 +394,7 @@ module.exports = {
   getCompletedAdoptionsByUser,
   deleteAdoptionRequest,
   getRequestsPaginated,
+  getAllCompletedAdoptions,
+  getCompletedAdoptionsPaginated,
+  getCompletedAdoptionsByUserId,
 };

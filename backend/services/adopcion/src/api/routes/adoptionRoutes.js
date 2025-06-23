@@ -8,6 +8,9 @@ const {
   getCompletedAdoptionsByUser,
   deleteAdoptionRequest,
   getRequestsPaginated,
+  getAllCompletedAdoptions,
+  getCompletedAdoptionsPaginated,
+  getCompletedAdoptionsByUserId,
 } = require("../views/adoptionController");
 const {
   verifyToken,
@@ -58,4 +61,24 @@ router.get(
   getRequestsPaginated
 );
 
+router.get(
+  "/completedAdoptions",
+  verifyToken,
+  authorizeRoles("empleado", "administrador"),
+  getAllCompletedAdoptions
+);
+
+router.get(
+  "/paginatedAdoptions/paginated",
+  verifyToken,
+  authorizeRoles("empleado", "administrador"),
+  getCompletedAdoptionsPaginated
+);
+
+router.get(
+  "/completedAdoptions/user/:userId",
+  verifyToken,
+  authorizeRoles("empleado", "administrador"),
+  getCompletedAdoptionsByUserId
+);
 module.exports = router;
