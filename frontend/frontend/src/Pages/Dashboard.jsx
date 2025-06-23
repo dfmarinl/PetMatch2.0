@@ -184,6 +184,7 @@ const Dashboard = () => {
               <option value="senior">Seniors (7+ años)</option>
             </select>
           </div>
+
           {(searchTerm || selectedSpecies || selectedGender || selectedAge) && (
             <div className="mt-4 flex items-center justify-between">
               <div className="flex flex-wrap gap-2">
@@ -212,6 +213,7 @@ const Dashboard = () => {
                       : "Seniors"}
                   </span>
                 )}
+                
               </div>
               <button
                 onClick={clearFilters}

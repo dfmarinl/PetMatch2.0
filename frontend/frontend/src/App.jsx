@@ -9,6 +9,7 @@ import PetRegistration from "./Pages/PetRegistration";
 import PetsCatalog from "./Pages/PetsCatalog";
 import ClientProfile from "./pages/ClientProfile";
 
+
 // Context para manejar el estado del usuario
 const AuthContext = createContext();
 

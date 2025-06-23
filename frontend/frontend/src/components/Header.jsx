@@ -1,8 +1,22 @@
 // components/Header.jsx
 import React from 'react';
 import { Heart, User, Bell, LogOut } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
-const Header = ({ user, onLogout }) => {
+const Header = ({ user }) => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    navigate('/');
+  };
+
+  const getRoleLabel = (rol) => {
+    if (rol === 'admin') return 'Admin';
+    if (rol === 'empleado') return 'Empleado';
+    return 'Usuario';
+  };
+
   return (
     <header className="bg-white shadow-sm border-b">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -11,9 +25,11 @@ const Header = ({ user, onLogout }) => {
             <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
               <Heart className="w-4 h-4 text-white fill-current" />
             </div>
-            <span className="ml-2 text-xl font-bold text-gray-900">PetMatch Admin</span>
+            <span className="ml-2 text-xl font-bold text-gray-900">
+              PetMatch {getRoleLabel(user?.rol)}
+            </span>
           </div>
-          
+
           <div className="flex items-center space-x-4">
             <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors relative">
               <Bell size={20} />
@@ -26,11 +42,11 @@ const Header = ({ user, onLogout }) => {
                 <User className="w-4 h-4 text-blue-500" />
               </div>
               <span className="text-sm font-medium text-gray-700">
-                Admin - {user?.name || user?.email}
+                {user?.firstName}
               </span>
             </div>
             <button
-              onClick={onLogout}
+              onClick={handleLogout}
               className="p-2 text-gray-400 hover:text-red-500 transition-colors"
               title="Cerrar sesión"
             >
