@@ -1,13 +1,30 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { AlertTriangle, X } from 'lucide-react';
+import { deletePetById } from '../../api/pet'; // Ajusta la ruta si es necesario
 
 const DeleteConfirmModal = ({
   isOpen,
   onClose,
-  onConfirm,
+  petId,
   petName,
-  loading = false
+  onDeleted // función callback para notificar al padre
 }) => {
+  const [loading, setLoading] = useState(false);
+   console.log('ID de la mascota a eliminar:', petId);
+  const handleDelete = async () => {
+    try {
+      setLoading(true);
+      await deletePetById(petId);
+      if (onDeleted) onDeleted(); // refrescar lista o mostrar mensaje en el padre
+      onClose();
+    } catch (error) {
+      console.error('Error al eliminar la mascota:', error);
+      // Aquí podrías mostrar un mensaje de error al usuario si lo deseas
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -61,7 +78,7 @@ const DeleteConfirmModal = ({
             Cancelar
           </button>
           <button
-            onClick={onConfirm}
+            onClick={handleDelete}
             disabled={loading}
             className="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >

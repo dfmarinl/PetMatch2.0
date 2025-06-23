@@ -231,7 +231,6 @@ const PetsCatalog = () => {
                     <div className="flex items-center text-xs text-gray-500">
                       <Calendar className="w-3 h-3 mr-1" />
                       <span>Agregado {new Date(pet.createdAt).toLocaleDateString()}</span>
-
                     </div>
                     <button className="bg-primary-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-600 transition-colors">
                       Ver Detalles
