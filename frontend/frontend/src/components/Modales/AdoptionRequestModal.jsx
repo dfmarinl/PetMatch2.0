@@ -1,129 +1,176 @@
-import React, { useState } from 'react';
-import Modal from '../ui/Modal'; // Asegúrate de tener un modal base reutilizable o ajusta según tu implementación
-import Button from '../ui/Button';
+import React, { useState } from "react";
+import { X } from "lucide-react";
+import { createAdoptionRequest } from "../../api/requests";
 
-const AdoptionRequestModal = ({ isOpen, onClose, onSubmit, petId, userId }) => {
-  const [formData, setFormData] = useState({
-    reasonForAdoption: '',
+const AdoptionRequestModal = ({ isOpen, onClose, pet }) => {
+  const [form, setForm] = useState({
+    reasonForAdoption: "",
     hadPetsBefore: false,
-    dailyTimeForPet: '',
+    dailyTimeForPet: "",
     livesAlone: false,
     hasChildrenAtHome: false,
-    residenceType: 'house',
+    residenceType: "",
     otherPetsAtHome: false,
   });
 
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+
+  if (!isOpen || !pet) return null;
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
-      [name]: type === 'checkbox' ? checked : value,
-    });
+    setForm((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const data = {
-      ...formData,
-      petId,
-      userId,
-    };
-    onSubmit(data);
-    onClose(); // Opcional: cerrar modal tras envío
+    setLoading(true);
+    setMessage("");
+
+    try {
+      await createAdoptionRequest({
+        petId: pet.id,
+        ...form,
+        dailyTimeForPet: parseFloat(form.dailyTimeForPet),
+      });
+
+      setMessage("¡Solicitud enviada con éxito!");
+      setForm({
+        reasonForAdoption: "",
+        hadPetsBefore: false,
+        dailyTimeForPet: "",
+        livesAlone: false,
+        hasChildrenAtHome: false,
+        residenceType: "",
+        otherPetsAtHome: false,
+      });
+      setTimeout(() => {
+      setMessage("");
+      onClose();
+    }, 1500);
+    } catch (error) {
+      setMessage("Error al enviar la solicitud.");
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Formulario de Solicitud de Adopción">
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium">¿Por qué quieres adoptar?</label>
+    <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
+      <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-lg relative">
+        <button
+          onClick={onClose}
+          className="absolute top-3 right-3 text-gray-500 hover:text-red-600"
+        >
+          <X size={20} />
+        </button>
+        <h2 className="text-xl font-semibold mb-4 text-gray-800">
+          Solicitud de Adopción para {pet.name}
+        </h2>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
           <textarea
             name="reasonForAdoption"
+            placeholder="¿Por qué quieres adoptar esta mascota?"
+            value={form.reasonForAdoption}
+            onChange={handleChange}
             required
-            value={formData.reasonForAdoption}
-            onChange={handleChange}
-            className="w-full border p-2 rounded"
+            className="w-full border rounded p-2"
           />
-        </div>
 
-        <div className="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            name="hadPetsBefore"
-            checked={formData.hadPetsBefore}
-            onChange={handleChange}
-          />
-          <label>¿Has tenido mascotas antes?</label>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium">¿Cuántas horas al día puedes dedicarle?</label>
           <input
             type="number"
             name="dailyTimeForPet"
-            required
             step="0.1"
             min="0"
-            value={formData.dailyTimeForPet}
+            placeholder="¿Cuántas horas al día dedicarías a la mascota?"
+            value={form.dailyTimeForPet}
             onChange={handleChange}
-            className="w-full border p-2 rounded"
+            required
+            className="w-full border rounded p-2"
           />
-        </div>
 
-        <div className="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            name="livesAlone"
-            checked={formData.livesAlone}
-            onChange={handleChange}
-          />
-          <label>¿Vives solo/a?</label>
-        </div>
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              name="hadPetsBefore"
+              checked={form.hadPetsBefore}
+              onChange={handleChange}
+            />
+            <label htmlFor="hadPetsBefore">¿Has tenido mascotas antes?</label>
+          </div>
 
-        <div className="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            name="hasChildrenAtHome"
-            checked={formData.hasChildrenAtHome}
-            onChange={handleChange}
-          />
-          <label>¿Tienes niños en casa?</label>
-        </div>
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              name="livesAlone"
+              checked={form.livesAlone}
+              onChange={handleChange}
+            />
+            <label htmlFor="livesAlone">¿Vives solo/a?</label>
+          </div>
 
-        <div>
-          <label className="block text-sm font-medium">Tipo de vivienda</label>
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              name="hasChildrenAtHome"
+              checked={form.hasChildrenAtHome}
+              onChange={handleChange}
+            />
+            <label htmlFor="hasChildrenAtHome">¿Hay niños en casa?</label>
+          </div>
+
           <select
             name="residenceType"
-            value={formData.residenceType}
+            value={form.residenceType}
             onChange={handleChange}
-            className="w-full border p-2 rounded"
+            required
+            className="w-full border rounded p-2"
           >
+            <option value="">Tipo de vivienda</option>
             <option value="house">Casa</option>
             <option value="apartment">Apartamento</option>
             <option value="farm">Finca</option>
             <option value="other">Otro</option>
           </select>
-        </div>
 
-        <div className="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            name="otherPetsAtHome"
-            checked={formData.otherPetsAtHome}
-            onChange={handleChange}
-          />
-          <label>¿Tienes otras mascotas?</label>
-        </div>
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              name="otherPetsAtHome"
+              checked={form.otherPetsAtHome}
+              onChange={handleChange}
+            />
+            <label htmlFor="otherPetsAtHome">¿Tienes otras mascotas en casa?</label>
+          </div>
 
-        <div className="flex justify-end space-x-2">
-          <Button type="button" onClick={onClose} variant="secondary">
-            Cancelar
-          </Button>
-          <Button type="submit">Enviar Solicitud</Button>
-        </div>
-      </form>
-    </Modal>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition-colors"
+          >
+            {loading ? "Enviando..." : "Enviar Solicitud"}
+          </button>
+
+          {message && (
+            <p
+              className={`text-sm mt-2 text-center ${
+                message.includes("éxito") ? "text-green-600" : "text-red-500"
+              }`}
+            >
+              {message}
+            </p>
+          )}
+        </form>
+      </div>
+    </div>
   );
 };
 
 export default AdoptionRequestModal;
+

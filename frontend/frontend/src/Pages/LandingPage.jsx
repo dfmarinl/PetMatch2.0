@@ -183,7 +183,7 @@ const LandingPage = () => {
             </div>
           </div>
           <div className="text-center text-gray-400 mt-8 border-t border-gray-800 pt-6">
-            <p>&copy; 2024 PetMatch. Todos los derechos reservados.</p>
+            <p>&copy; 2025 PetMatch. Todos los derechos reservados.</p>
           </div>
         </footer>
       </div>
