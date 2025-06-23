@@ -10,6 +10,7 @@ import PetsCatalog from './Pages/PetsCatalog';
 
 
 
+
 // Context para manejar el estado del usuario
 const AuthContext = createContext();
 
