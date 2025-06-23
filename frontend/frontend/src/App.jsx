@@ -8,7 +8,7 @@ import AdminDashboard from "./Pages/AdminDashboard";
 import PetRegistration from "./Pages/PetRegistration";
 import PetsCatalog from "./Pages/PetsCatalog";
 import ClientProfile from "./pages/ClientProfile";
-
+import StaffProfile from "./pages/StaffProfile";
 
 // Context para manejar el estado del usuario
 const AuthContext = createContext();
@@ -45,6 +45,7 @@ function App() {
             <Route path="/admin/pets/new" element={<PetRegistration />} />
             <Route path="/pets" element={<PetsCatalog />} />
             <Route path="/profile" element={<ClientProfile />} />
+            <Route path="/staff-profile" element={<StaffProfile />} />
           </Routes>
         </div>
       </Router>
