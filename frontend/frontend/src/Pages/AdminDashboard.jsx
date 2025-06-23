@@ -107,6 +107,8 @@ const AdminDashboard = () => {
   };
 
   useEffect(() => {
+    fetchApiPets();              // Carga inicial de mascotas
+    fetchAdoptionRequests();  
     if (activeTab === 'pets') fetchApiPets();
     if (activeTab === 'users' && user?.rol !== 'empleado') fetchApiUsers();
     if (activeTab === 'requests') fetchAdoptionRequests();
@@ -176,7 +178,7 @@ const AdminDashboard = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <NavigationTabs activeTab={activeTab} setActiveTab={setActiveTab} userRole={user.rol} />
 
-        {activeTab === 'overview' && <OverviewTab pets={apiPets} users={apiUsers} />}
+        {activeTab === 'overview' && <OverviewTab pets={apiPets} users={apiUsers} adoptionRequests={adoptionRequests} />}
 
         {activeTab === 'pets' && (
           <PetsTab
