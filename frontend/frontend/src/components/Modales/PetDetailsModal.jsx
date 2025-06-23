@@ -1,29 +1,31 @@
-import React from 'react';
-import { X, Calendar, Heart } from 'lucide-react';
+import React from "react";
+import { X, Calendar, Heart } from "lucide-react";
 
 const PetDetailsModal = ({ isOpen, onClose, pet }) => {
   if (!isOpen || !pet) return null;
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('es-CO', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
+    return date.toLocaleDateString("es-CO", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 
   const getStatusColor = (available) => {
     return available
-      ? 'bg-green-100 text-green-800'
-      : 'bg-blue-100 text-blue-800';
+      ? "bg-green-100 text-green-800"
+      : "bg-blue-100 text-blue-800";
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] overflow-hidden">
         <div className="flex items-center justify-between p-6 border-b">
-          <h2 className="text-xl font-semibold text-gray-900">Detalles de {pet.name}</h2>
+          <h2 className="text-xl font-semibold text-gray-900">
+            Detalles de {pet.name}
+          </h2>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -44,13 +46,21 @@ const PetDetailsModal = ({ isOpen, onClose, pet }) => {
                 />
                 <div className="mt-4 space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-500">Estado:</span>
-                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(pet.available)}`}>
-                      {pet.available ? 'Disponible' : 'Adoptado'}
+                    <span className="text-sm font-medium text-gray-500">
+                      Estado:
+                    </span>
+                    <span
+                      className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(
+                        pet.available
+                      )}`}
+                    >
+                      {pet.available ? "Disponible" : "Adoptado"}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-500">ID:</span>
+                    <span className="text-sm font-medium text-gray-500">
+                      ID:
+                    </span>
                     <span className="text-sm text-gray-900">{pet.id}</span>
                   </div>
                 </div>
@@ -60,28 +70,44 @@ const PetDetailsModal = ({ isOpen, onClose, pet }) => {
               <div className="lg:col-span-2 space-y-6">
                 {/* Información Básica */}
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Información Básica</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                    Información Básica
+                  </h3>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-500">Nombre</label>
+                      <label className="block text-sm font-medium text-gray-500">
+                        Nombre
+                      </label>
                       <p className="mt-1 text-sm text-gray-900">{pet.name}</p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-500">Especie</label>
-                      <p className="mt-1 text-sm text-gray-900">{pet.species}</p>
+                      <label className="block text-sm font-medium text-gray-500">
+                        Especie
+                      </label>
+                      <p className="mt-1 text-sm text-gray-900">
+                        {pet.species}
+                      </p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-500">Raza</label>
+                      <label className="block text-sm font-medium text-gray-500">
+                        Raza
+                      </label>
                       <p className="mt-1 text-sm text-gray-900">{pet.breed}</p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-500">Edad</label>
-                      <p className="mt-1 text-sm text-gray-900">{pet.age} año(s)</p>
+                      <label className="block text-sm font-medium text-gray-500">
+                        Edad
+                      </label>
+                      <p className="mt-1 text-sm text-gray-900">
+                        {pet.age} año(s)
+                      </p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-500">Género</label>
+                      <label className="block text-sm font-medium text-gray-500">
+                        Género
+                      </label>
                       <p className="mt-1 text-sm text-gray-900">
-                        {pet.gender === 'female' ? 'Hembra' : 'Macho'}
+                        {pet.gender === "female" ? "Hembra" : "Macho"}
                       </p>
                     </div>
                   </div>
@@ -89,8 +115,12 @@ const PetDetailsModal = ({ isOpen, onClose, pet }) => {
 
                 {/* Descripción */}
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Descripción</h3>
-                  <p className="text-sm text-gray-700 leading-relaxed">{pet.description}</p>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                    Descripción
+                  </h3>
+                  <p className="text-sm text-gray-700 leading-relaxed">
+                    {pet.description}
+                  </p>
                 </div>
 
                 {/* Fechas */}
@@ -101,12 +131,20 @@ const PetDetailsModal = ({ isOpen, onClose, pet }) => {
                   </h3>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-500">Fecha de Registro</label>
-                      <p className="mt-1 text-sm text-gray-900">{formatDate(pet.createdAt)}</p>
+                      <label className="block text-sm font-medium text-gray-500">
+                        Fecha de Registro
+                      </label>
+                      <p className="mt-1 text-sm text-gray-900">
+                        {formatDate(pet.createdAt)}
+                      </p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-500">Última Actualización</label>
-                      <p className="mt-1 text-sm text-gray-900">{formatDate(pet.updatedAt)}</p>
+                      <label className="block text-sm font-medium text-gray-500">
+                        Última Actualización
+                      </label>
+                      <p className="mt-1 text-sm text-gray-900">
+                        {formatDate(pet.updatedAt)}
+                      </p>
                     </div>
                   </div>
                 </div>

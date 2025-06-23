@@ -171,7 +171,7 @@ const getMe = async (req, res) => {
 // Verificar contraseña actual
 const verifyCurrentPassword = async (req, res) => {
   try {
-    const { userId } = req.user;
+    const userId = req.user.id;
     const { currentPassword } = req.body;
 
     const usuario = await User.findByPk(userId);
@@ -189,9 +189,119 @@ const verifyCurrentPassword = async (req, res) => {
   }
 };
 
+//Actualizar contraseña
+const updatePassword = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { newPassword } = req.body;
+
+    if (!newPassword || newPassword.length < 8) {
+      return res.status(400).json({
+        message: "La nueva contraseña debe tener al menos 8 caracteres",
+      });
+    }
+
+    const usuario = await User.findByPk(userId);
+    if (!usuario) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+
+    // Hashear la nueva contraseña
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    usuario.password = hashedPassword;
+
+    await usuario.save();
+
+    res.status(200).json({ message: "Contraseña actualizada correctamente" });
+  } catch (error) {
+    console.error("Error al actualizar contraseña:", error);
+    res.status(500).json({ message: "Error interno del servidor" });
+  }
+};
+
+// Actualizar información personal
+const updateProfile = async (req, res) => {
+  try {
+    const { id: userId } = req.user;
+
+    const {
+      firstName,
+      lastName,
+      identificationNumber,
+      age,
+      email,
+      city,
+      direction,
+    } = req.body;
+
+    // Validaciones básicas
+    if (
+      !firstName ||
+      !lastName ||
+      !identificationNumber ||
+      !age ||
+      !email ||
+      !city ||
+      !direction
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Todos los campos son obligatorios" });
+    }
+
+    const usuario = await User.findByPk(userId);
+    if (!usuario) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+
+    // Verificar si el nuevo email ya está en uso por otro usuario
+    if (email !== usuario.email) {
+      const emailExistente = await User.findOne({
+        where: { email },
+      });
+      if (emailExistente) {
+        return res.status(400).json({
+          message: "El nuevo email ya está registrado por otro usuario",
+        });
+      }
+    }
+
+    // Actualizar campos permitidos
+    usuario.firstName = firstName;
+    usuario.lastName = lastName;
+    usuario.identificationNumber = identificationNumber;
+    usuario.age = age;
+    usuario.email = email;
+    usuario.city = city;
+    usuario.direction = direction;
+
+    await usuario.save();
+
+    res.status(200).json({
+      message: "Perfil actualizado correctamente",
+      user: {
+        id: usuario.id,
+        firstName: usuario.firstName,
+        lastName: usuario.lastName,
+        email: usuario.email,
+        city: usuario.city,
+        direction: usuario.direction,
+        identificationNumber: usuario.identificationNumber,
+        age: usuario.age,
+        rol: usuario.rol,
+      },
+    });
+  } catch (error) {
+    console.error("Error al actualizar perfil:", error);
+    res.status(500).json({ message: "Error interno del servidor" });
+  }
+};
+
 module.exports = {
   register,
   login,
   getMe,
   verifyCurrentPassword,
+  updatePassword,
+  updateProfile,
 };
