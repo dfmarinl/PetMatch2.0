@@ -6,28 +6,42 @@ import LoginForm from '../components/auth/LoginForm';
 import Button from '../components/ui/Button';
 import { loginRequest } from '../api/auth'; // <-- importa la función
 
+
 const Login = () => {
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogin = async (formData) => {
-    setLoading(true);
-    try {
-      const { user } = await loginRequest(formData.email, formData.password);
+ const handleLogin = async (formData) => {
+  setLoading(true);
+  try {
+    const { user } = await loginRequest(formData.email, formData.password);
 
-      // Guardar usuario en contexto o estado global
-      login(user);
+    // Guardar usuario en contexto o estado global
+    login(user);
 
-      // Redirigir
-      navigate('/dashboard');
-    } catch (error) {
-      console.error('Error:', error);
-      alert(error.message || 'Error al iniciar sesión');
-    } finally {
-      setLoading(false);
+    // Redirigir según el rol
+    switch (user.rol) {
+      case 'cliente':
+        navigate('/dashboard');
+        break;
+      case 'empleado':
+        navigate('/admin');
+        break;
+      case 'administrador':
+        navigate('/admin');
+        break;
+      default:
+        navigate('/dashboard');
     }
-  };
+  } catch (error) {
+    console.error('Error:', error);
+    alert(error.message || 'Error al iniciar sesión');
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <AuthLayout

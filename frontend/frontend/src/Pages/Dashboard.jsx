@@ -1,45 +1,31 @@
 import { useAuth } from '../App';
 import { useNavigate } from 'react-router-dom';
 import { Heart, User, Settings, LogOut, Bell, Search, Filter } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { getAllPets } from '../api/pet';
 
 const Dashboard = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, token } = useAuth();
   const navigate = useNavigate();
+  const [pets, setPets] = useState([]);
 
   const handleLogout = () => {
     logout();
     navigate('/');
   };
 
-  const pets = [
-    {
-      id: 1,
-      name: "Luna",
-      type: "Perro",
-      breed: "Golden Retriever",
-      age: "2 años",
-      image: "https://images.pexels.com/photos/1805164/pexels-photo-1805164.jpeg?auto=compress&cs=tinysrgb&w=400",
-      description: "Luna es una perrita muy cariñosa y juguetona, perfecta para familias con niños."
-    },
-    {
-      id: 2,
-      name: "Milo",
-      type: "Gato",
-      breed: "Siamés",
-      age: "1 año",
-      image: "https://images.pexels.com/photos/1170986/pexels-photo-1170986.jpeg?auto=compress&cs=tinysrgb&w=400",
-      description: "Milo es un gatito muy inteligente y cariñoso, ideal para apartamentos."
-    },
-    {
-      id: 3,
-      name: "Max",
-      type: "Perro",
-      breed: "Labrador",
-      age: "3 años",
-      image: "https://images.pexels.com/photos/1108099/pexels-photo-1108099.jpeg?auto=compress&cs=tinysrgb&w=400",
-      description: "Max es un perro muy activo y leal, perfecto para personas que disfrutan del ejercicio."
-    }
-  ];
+  useEffect(() => {
+    const fetchPets = async () => {
+      try {
+        const data = await getAllPets(token);
+        setPets(data);
+      } catch (error) {
+        console.error('Error al obtener mascotas:', error);
+      }
+    };
+
+    fetchPets();
+  }, [token]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -53,7 +39,6 @@ const Dashboard = () => {
               </div>
               <span className="ml-2 text-xl font-bold text-gray-900">PetMatch</span>
             </div>
-            
             <div className="flex items-center space-x-4">
               <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors">
                 <Bell size={20} />
@@ -80,7 +65,6 @@ const Dashboard = () => {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Welcome Section */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             ¡Bienvenido, {user?.name || 'Usuario'}!
@@ -117,11 +101,11 @@ const Dashboard = () => {
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Mascotas Disponibles</p>
-                <p className="text-2xl font-bold text-gray-900">156</p>
+                <p className="text-2xl font-bold text-gray-900">{pets.length}</p>
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-lg shadow-sm p-6">
             <div className="flex items-center">
               <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
@@ -133,7 +117,7 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-lg shadow-sm p-6">
             <div className="flex items-center">
               <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
@@ -162,14 +146,19 @@ const Dashboard = () => {
                   <div className="flex justify-between items-start mb-2">
                     <h3 className="text-xl font-semibold text-gray-900">{pet.name}</h3>
                     <span className="text-sm bg-primary-100 text-primary-700 px-2 py-1 rounded-full">
-                      {pet.type}
+                      {pet.species}
                     </span>
                   </div>
-                  <p className="text-gray-600 text-sm mb-2">{pet.breed} • {pet.age}</p>
+                  <p className="text-gray-600 text-sm mb-2">{pet.breed} • {pet.age || 'Edad no disponible'}</p>
                   <p className="text-gray-600 text-sm mb-4">{pet.description}</p>
-                  <button className="w-full bg-primary-500 text-white py-2 px-4 rounded-lg hover:bg-primary-600 transition-colors">
+                 <div className="flex flex-col sm:flex-row gap-2">
+                <button className="flex-1 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-primary-600 transition-colors">
                     Ver Detalles
-                  </button>
+                </button>
+                <button className="flex-1 bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition-colors">
+                    Adoptar
+                </button>
+                </div>
                 </div>
               </div>
             ))}
@@ -187,7 +176,6 @@ const Dashboard = () => {
               <p className="font-medium text-gray-900">Mis Favoritos</p>
               <p className="text-sm text-gray-600">Ver mascotas guardadas</p>
             </button>
-            
             <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left">
               <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mb-2">
                 <User className="w-4 h-4 text-green-500" />
@@ -195,7 +183,6 @@ const Dashboard = () => {
               <p className="font-medium text-gray-900">Mi Perfil</p>
               <p className="text-sm text-gray-600">Actualizar información</p>
             </button>
-            
             <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left">
               <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center mb-2">
                 <Settings className="w-4 h-4 text-orange-500" />
@@ -203,7 +190,6 @@ const Dashboard = () => {
               <p className="font-medium text-gray-900">Solicitudes</p>
               <p className="text-sm text-gray-600">Estado de adopciones</p>
             </button>
-            
             <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left">
               <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mb-2">
                 <Bell className="w-4 h-4 text-blue-500" />

@@ -6,6 +6,8 @@ import Register from './Pages/Register';
 import Dashboard from './Pages/Dashboard';
 import AdminDashboard from './Pages/AdminDashboard';
 import PetRegistration from './Pages/PetRegistration';
+import PetsCatalog from './Pages/PetsCatalog';
+
 
 
 // Context para manejar el estado del usuario
@@ -41,6 +43,7 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/pets/new" element={<PetRegistration />} />
+            <Route path="/pets" element={<PetsCatalog />} />
           </Routes>
         </div>
       </Router>
