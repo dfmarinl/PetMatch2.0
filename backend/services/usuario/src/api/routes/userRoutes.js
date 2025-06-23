@@ -14,9 +14,9 @@ const {
   deleteUser,
 } = require("../views/userController");
 
-router.post("/", verifyToken, authorizeRoles("administrador"), createUser);
+router.post("/", verifyToken, authorizeRoles("administrador","empleado"), createUser);
 
-router.get("/", verifyToken, authorizeRoles("administrador"), getAllUsers);
+router.get("/", verifyToken, authorizeRoles("administrador","empleado"), getAllUsers);
 
 router.get(
   "/paginado",
@@ -25,10 +25,10 @@ router.get(
   getUsersPages
 );
 
-router.get("/:id", verifyToken, authorizeRoles("administrador"), getUserById);
+router.get("/:id", verifyToken, authorizeRoles("administrador","empleado"), getUserById);
 
-router.put("/:id", verifyToken, authorizeRoles("administrador"), updateUser);
+router.put("/:id", verifyToken, authorizeRoles("administrador","empleado"), updateUser);
 
-router.delete("/:id", verifyToken, authorizeRoles("administrador"), deleteUser);
+router.delete("/:id", verifyToken, authorizeRoles("administrador","empleado"), deleteUser);
 
 module.exports = router;
