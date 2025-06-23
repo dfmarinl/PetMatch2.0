@@ -21,7 +21,10 @@ function verifyToken(req, res, next) {
       return res.status(401).json({ message: "Token inválido o expirado" });
     }
 
-    req.user = decoded; // aquí queda disponible { userId, rol }
+    req.user = {
+      id: decoded.userId, // Mapeo manual
+      rol: decoded.rol,
+    };
     next();
   });
 }

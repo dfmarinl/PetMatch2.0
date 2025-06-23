@@ -1,4 +1,9 @@
-const User = require("../../../../../models/user");
+const {
+  User,
+  AdoptionRequest,
+  CompletedAdoption,
+  Pet,
+} = require("../../../../../models");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
@@ -95,18 +100,71 @@ const login = async (req, res) => {
 // Obtener datos del usuario autenticado
 const getMe = async (req, res) => {
   try {
-    const { userId } = req.user; // <- del middleware auth
+    const userId = req.user.id;
+
     const usuario = await User.findByPk(userId, {
       attributes: { exclude: ["password"] },
     });
 
-    if (!usuario)
+    if (!usuario) {
       return res.status(404).json({ message: "Usuario no encontrado" });
+    }
 
-    res.status(200).json(usuario);
+    // Obtener solicitudes del usuario
+    const adoptionRequests = await AdoptionRequest.findAll({
+      where: { userId },
+      include: [
+        {
+          model: Pet,
+          attributes: ["id", "name", "species", "breed", "image"],
+        },
+      ],
+      order: [["id", "DESC"]],
+    });
+
+    // Paso 1: Buscar las solicitudes aprobadas del usuario (solo IDs)
+    const approvedRequests = await AdoptionRequest.findAll({
+      where: {
+        userId: userId,
+        adoptionStatus: "approved",
+      },
+      attributes: ["id", "petId"], // Solo necesitamos estos campos
+    });
+
+    // Paso 2: Extraer los IDs de las mascotas de las solicitudes aprobadas
+    const adoptedPetIds = approvedRequests.map((request) => request.petId);
+
+    // Paso 3: Obtener la información de las mascotas adoptadas
+    let adoptedPets = [];
+
+    if (adoptedPetIds.length > 0) {
+      adoptedPets = await Pet.findAll({
+        where: {
+          id: adoptedPetIds,
+        },
+        attributes: [
+          "id",
+          "name",
+          "species",
+          "breed",
+          "image",
+          "age",
+          "gender",
+        ],
+      });
+    }
+
+    res.status(200).json({
+      ...usuario.toJSON(),
+      AdoptionRequests: adoptionRequests,
+      AdoptedPets: adoptedPets, // Solo las mascotas adoptadas
+    });
   } catch (error) {
     console.error("Error en getMe:", error);
-    res.status(500).json({ message: "Error al obtener datos del usuario" });
+    res.status(500).json({
+      message: "Error al obtener datos del usuario",
+      error: error.message,
+    });
   }
 };
 
