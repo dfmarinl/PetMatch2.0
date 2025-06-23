@@ -64,7 +64,7 @@ const AdminDashboard = () => {
       const response = await getAllPets();
       setApiPets(response || []);
     } catch (error) {
-      setApiError('Error al cargar las mascotas desde la API');
+      setApiError('Error al cargar las mascotas desde la API',error);
       setApiPets([]);
     } finally {
       setApiLoading(false);
@@ -77,7 +77,7 @@ const AdminDashboard = () => {
       const response = await getAllUsers();
       setApiUsers(response || []);
     } catch (error) {
-      setApiUsersError('Error al cargar los usuarios desde la API');
+      setApiUsersError('Error al cargar los usuarios desde la API',error);
       setApiUsers([]);
     } finally {
       setApiUsersLoading(false);
@@ -90,7 +90,7 @@ const AdminDashboard = () => {
       const response = await getAllRequests();
       setAdoptionRequests(response || []);
     } catch (error) {
-      setAdoptionError('Error al cargar solicitudes de adopción');
+      setAdoptionError('Error al cargar solicitudes de adopción',error);
     } finally {
       setAdoptionLoading(false);
     }

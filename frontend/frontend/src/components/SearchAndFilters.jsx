@@ -57,9 +57,10 @@ const SearchAndFilters = ({
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="all">Todos los estados</option>
-                  <option value={true}>Disponible</option>
-                  <option value={false}>No Disponible</option>
+                  <option value="available">Disponible</option>
+                  <option value="adopted">No Disponible</option>
                 </select>
+
               </div>
             )}
             
@@ -74,6 +75,8 @@ const SearchAndFilters = ({
                   <option value="all">Todos los tipos</option>
                   <option value="Perro">Perro</option>
                   <option value="Gato">Gato</option>
+                  <option value="Conejo">Conejo</option>
+                  <option value="Ave">Ave</option>
                   <option value="Otro">Otro</option>
                 </select>
               </div>

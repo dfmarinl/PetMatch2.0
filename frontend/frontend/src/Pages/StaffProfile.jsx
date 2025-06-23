@@ -1,3 +1,4 @@
+// ... imports iguales
 import { useEffect, useState } from "react";
 import { getMeRequest, updateProfileRequest } from "../api/auth";
 import UpdateProfileModal from "../components/Modales/UpdateProfileModal";
@@ -107,9 +108,17 @@ const StaffProfile = () => {
 
       {/* Main */}
       <main className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-4xl font-bold text-gray-900 mb-6 text-center">
-          Perfil de {userData.firstName}
-        </h1>
+        <div className="flex justify-between items-center mb-6">
+          <button
+            onClick={() => navigate(-1)}
+            className="text-sm text-blue-600 hover:underline"
+          >
+            ← Volver atrás
+          </button>
+          <h1 className="text-4xl font-bold text-gray-900 text-center flex-1">
+            Perfil de {userData.firstName}
+          </h1>
+        </div>
 
         <div className="w-full max-w-5xl mx-auto bg-white rounded-lg shadow-sm p-6 border border-gray-300 mb-8">
           {/* Información Personal */}
@@ -188,3 +197,4 @@ const StaffProfile = () => {
 };
 
 export default StaffProfile;
+

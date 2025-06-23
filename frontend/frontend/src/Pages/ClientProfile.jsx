@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { getMeRequest, updateProfileRequest } from "../api/auth";
 import {
+  getMeRequest,
+  updateProfileRequest,
   verifyCurrentPasswordRequest,
   updatePasswordRequest,
 } from "../api/auth";
@@ -119,9 +120,17 @@ const ClientProfile = () => {
 
       {/* Main */}
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6 text-center">
-          Perfil de {userData.firstName}
-        </h1>
+        <div className="flex justify-between items-center mb-6">
+          <button
+            onClick={() => navigate(-1)}
+            className="text-sm text-blue-600 hover:underline"
+          >
+            ← Volver atrás
+          </button>
+          <h1 className="text-2xl font-bold text-gray-900 text-center flex-1">
+            Perfil de {userData.firstName}
+          </h1>
+        </div>
 
         <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-300 mb-8">
           {/* Información Personal */}
@@ -276,3 +285,4 @@ const ClientProfile = () => {
 };
 
 export default ClientProfile;
+
