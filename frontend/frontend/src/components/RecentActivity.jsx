@@ -1,4 +1,3 @@
-// components/RecentActivity.jsx
 import React from 'react';
 
 const RecentActivity = ({
@@ -7,7 +6,7 @@ const RecentActivity = ({
   getStatusColor,
   getDisplayStatus,
   getRequestStatusColor,
-  getPriorityColor
+  getPriorityColor,
 }) => {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -18,7 +17,7 @@ const RecentActivity = ({
         </div>
         <div className="p-6">
           <div className="space-y-4">
-            {allPetsForStats.slice(0, 3).map((pet) => (
+            {allPetsForStats.slice(0, 5).map((pet) => (
               <div key={pet.id} className="flex items-center space-x-4">
                 <img
                   src={pet.image || pet.imageUrl || '/placeholder-pet.jpg'}
@@ -30,7 +29,9 @@ const RecentActivity = ({
                 />
                 <div className="flex-1">
                   <p className="text-sm font-medium text-gray-900">{pet.name}</p>
-                  <p className="text-sm text-gray-500">{pet.breed} • {pet.age}</p>
+                  <p className="text-sm text-gray-500">
+                    {pet.breed} • {pet.age}
+                  </p>
                 </div>
                 <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(pet.available)}`}>
                   {getDisplayStatus(pet.available)}
@@ -53,19 +54,20 @@ const RecentActivity = ({
         </div>
         <div className="p-6">
           <div className="space-y-4">
-            {adoptionRequests.slice(0, 3).map((request) => (
+            {adoptionRequests.slice(0, 5).map((request) => (
               <div key={request.id} className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-900">{request.applicantName}</p>
-                  <p className="text-sm text-gray-500">Solicita adoptar a {request.petName}</p>
+                  <p className="text-sm font-medium text-gray-900">
+                    Usuario ID: {request.userId}
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    Solicita adoptar a {request.Pet?.name || 'Mascota desconocida'}
+                  </p>
                 </div>
                 <div className="text-right">
-                  <span className={`px-2 py-1 text-xs font-medium rounded-full ${getRequestStatusColor(request.status)}`}>
-                    {request.status}
+                  <span className={`px-2 py-1 text-xs font-medium rounded-full ${getRequestStatusColor(request.adoptionStatus)}`}>
+                    {request.adoptionStatus}
                   </span>
-                  <p className={`text-xs mt-1 ${getPriorityColor(request.priority)}`}>
-                    {request.priority}
-                  </p>
                 </div>
               </div>
             ))}
@@ -82,3 +84,5 @@ const RecentActivity = ({
 };
 
 export default RecentActivity;
+
+
