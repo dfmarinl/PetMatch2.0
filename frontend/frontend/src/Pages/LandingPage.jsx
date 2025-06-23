@@ -116,7 +116,7 @@ const LandingPage = () => {
         <section className="py-20 px-4">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16 bg-white/70 p-6 rounded-xl">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900/90 mb-4">¿Por qué elegir PetAdopt?</h2>
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900/90 mb-4">¿Por qué elegir PetMatch?</h2>
               <p className="text-xl text-gray-600/80 max-w-2xl mx-auto">Nuestro compromiso va más allá de la adopción. Creamos vínculos duraderos entre mascotas y familias.</p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -152,7 +152,7 @@ const LandingPage = () => {
                 <div className="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center">
                   <Heart className="w-4 h-4 text-white fill-current" />
                 </div>
-                <span className="ml-2 text-lg font-bold">PetAdopt</span>
+                <span className="ml-2 text-lg font-bold">PetMatch</span>
               </div>
               <p className="text-gray-400">Conectando corazones, creando familias.</p>
             </div>
@@ -183,7 +183,7 @@ const LandingPage = () => {
             </div>
           </div>
           <div className="text-center text-gray-400 mt-8 border-t border-gray-800 pt-6">
-            <p>&copy; 2024 PetAdopt. Todos los derechos reservados.</p>
+            <p>&copy; 2024 PetMatch. Todos los derechos reservados.</p>
           </div>
         </footer>
       </div>

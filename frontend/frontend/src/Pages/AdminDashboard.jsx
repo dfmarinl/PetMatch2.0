@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getAllPets } from '../api/pet';
 import { getAllUsers, deleteUser, updateUser } from '../api/users';
+import { useAuth } from '../App';
 
 // Components
 import Header from '../components/Header';
@@ -18,11 +19,6 @@ import DeleteConfirmModal from '../components/Modales/DeleteConfirmModal';
 import UserModal from '../components/Modales/UserModal';
 import UserDetailsModal from '../components/Modales/UserDetailsModal';
 import DeleteUserConfirmModal from '../components/Modales/DeleteUserConfirmModal';
-
-const useAuth = () => ({
-  user: { name: 'Admin', email: 'admin@petadopt.com' },
-  logout: () => console.log('Logging out...')
-});
 
 const AdminDashboard = () => {
   const { user, logout } = useAuth();
@@ -79,8 +75,8 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     if (activeTab === 'pets') fetchApiPets();
-    else if (activeTab === 'users') fetchApiUsers();
-  }, [activeTab]);
+    if (activeTab === 'users' && user?.rol !== 'empleado') fetchApiUsers();
+  }, [activeTab, user]);
 
   const handleCreatePet = () => {
     setSelectedPet(null);
@@ -104,9 +100,8 @@ const AdminDashboard = () => {
 
   const handlePetSubmit = async (formData) => {
     try {
-      // create or update logic here...
       setShowPetModal(false);
-      if (activeTab === 'pets') await fetchApiPets();
+      await fetchApiPets();
     } catch (error) {
       console.error('Error submitting pet:', error);
     }
@@ -114,7 +109,6 @@ const AdminDashboard = () => {
 
   const handleConfirmDelete = async () => {
     try {
-      // delete logic here...
       setShowDeleteModal(false);
       setSelectedPet(null);
       await fetchApiPets();
@@ -148,11 +142,13 @@ const AdminDashboard = () => {
     }
   };
 
+  if (!user) return <div className="p-4">Cargando usuario...</div>;
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header user={user} onLogout={logout} />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <NavigationTabs activeTab={activeTab} setActiveTab={setActiveTab} />
+        <NavigationTabs activeTab={activeTab} setActiveTab={setActiveTab} userRole={user.rol} />
 
         {activeTab === 'overview' && (
           <OverviewTab pets={apiPets} users={apiUsers} />
@@ -181,24 +177,23 @@ const AdminDashboard = () => {
 
         {activeTab === 'requests' && <RequestsTab />}
 
-        {activeTab === 'users' && (
+        {activeTab === 'users' && user.rol !== 'empleado' && (
           <UsersTab
-          users={apiUsers}
-          loading={apiUsersLoading}
-          error={apiUsersError}
-          onRefresh={fetchApiUsers}
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          selectedUser={selectedUser}
-          setSelectedUser={setSelectedUser}
-          showUserModal={showUserModal}
-          setShowUserModal={setShowUserModal}
-          showUserDetailsModal={showUserDetailsModal}
-          setShowUserDetailsModal={setShowUserDetailsModal}
-          showDeleteUserModal={showDeleteUserModal}
-          setShowDeleteUserModal={setShowDeleteUserModal}
-        />
-
+            users={apiUsers}
+            loading={apiUsersLoading}
+            error={apiUsersError}
+            onRefresh={fetchApiUsers}
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            selectedUser={selectedUser}
+            setSelectedUser={setSelectedUser}
+            showUserModal={showUserModal}
+            setShowUserModal={setShowUserModal}
+            showUserDetailsModal={showUserDetailsModal}
+            setShowUserDetailsModal={setShowUserDetailsModal}
+            showDeleteUserModal={showDeleteUserModal}
+            setShowDeleteUserModal={setShowDeleteUserModal}
+          />
         )}
       </div>
 
@@ -249,3 +244,4 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
+
