@@ -40,10 +40,9 @@ const LandingPage = () => {
   ];
 
   return (
-    <div
-      className="min-h-screen scroll-smooth bg-cover bg-center bg-no-repeat"
-      style={{ backgroundImage: "url('/img/fondo.png')" }}
-    >
+
+    <div className="min-h-screen scroll-smooth bg-cover bg-center bg-no-repeat" style={{ backgroundImage: "url('/img/pet5.jpg')" }}>
+
       <div className="min-h-screen bg-white/60">
         {/* NAVBAR */}
         <nav className="bg-gray-800 shadow-sm">
