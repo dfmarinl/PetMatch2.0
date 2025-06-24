@@ -112,14 +112,18 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#f8f9fa]">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+      <header className="bg-[#1f2937] shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <img src="/dog.png" alt="Logo" className="w-6 h-6 object-contain" />
-              <span className="ml-2 text-xl font-bold text-gray-900">
+              <img
+                src="/dog.png"
+                alt="Logo"
+                className="w-6 h-6 object-contain"
+              />
+              <span className="ml-2 text-xl font-bold text-white">
                 PetMatch
               </span>
             </div>
@@ -129,16 +133,16 @@ const Dashboard = () => {
                 className="flex items-center space-x-2 cursor-pointer hover:opacity-80 transition-opacity"
                 title="Ir a Mi Perfil"
               >
-                <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
-                  <User className="w-4 h-4 text-primary-500" />
+                <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+                  <User className="w-4 h-4 text-gray-700" />
                 </div>
-                <span className="text-sm font-medium text-gray-700">
+                <span className="ttext-sm font-medium text-white">
                   {user?.firstName || user?.email}
                 </span>
               </div>
               <button
                 onClick={handleLogout}
-                className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                className="p-2 text-gray-300 hover:text-red-400 transition-colors"
                 title="Cerrar sesión"
               >
                 <LogOut size={20} />
@@ -271,8 +275,8 @@ const Dashboard = () => {
       />
 
       {/* Footer */}
-      <footer className="bg-white border-t shadow-sm py-4 mt-auto">
-        <div className="max-w-7xl mx-auto px-4 text-center text-sm text-gray-500">
+      <footer className="bg-[#1f2937] text-gray-300 py-4 mt-auto">
+        <div className="max-w-7xl mx-auto px-4 text-center text-sm text-gray-300">
           © 2025 PetMatch. Todos los derechos reservados. Desarrollado por el
           equipo de PetMatch.
         </div>
@@ -282,4 +286,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-

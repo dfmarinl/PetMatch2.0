@@ -64,9 +64,7 @@ const AdminDashboard = () => {
       const response = await getAllPets();
       setApiPets(response || []);
     } catch (error) {
-
       setApiError("Error al cargar las mascotas desde la API");
-
 
       setApiPets([]);
     } finally {
@@ -80,7 +78,6 @@ const AdminDashboard = () => {
       const response = await getAllUsers();
       setApiUsers(response || []);
     } catch (error) {
-
       setApiUsersError("Error al cargar los usuarios desde la API");
 
       setApiUsers([]);
@@ -95,9 +92,7 @@ const AdminDashboard = () => {
       const response = await getAllRequests();
       setAdoptionRequests(response || []);
     } catch (error) {
-
       setAdoptionError("Error al cargar solicitudes de adopción");
-
     } finally {
       setAdoptionLoading(false);
     }
@@ -180,7 +175,7 @@ const AdminDashboard = () => {
   if (!user) return <div className="p-4">Cargando usuario...</div>;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#f8f9fa]">
       <Header user={user} onLogout={logout} />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <NavigationTabs
@@ -286,8 +281,8 @@ const AdminDashboard = () => {
         onConfirm={handleConfirmDeleteUser}
       />
       {/* Footer */}
-      <footer className="bg-white border-t shadow-sm py-4 mt-auto">
-        <div className="max-w-7xl mx-auto px-4 text-center text-sm text-gray-500">
+      <footer className="bg-[#1f2937] text-gray-300 py-4 mt-auto">
+        <div className="max-w-7xl mx-auto px-4 text-center text-sm text-gray-300">
           © 2025 PetMatch. Todos los derechos reservados. Desarrollado por el
           equipo de PetMatch.
         </div>
