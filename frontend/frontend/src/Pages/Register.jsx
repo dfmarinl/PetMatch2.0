@@ -1,10 +1,10 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../App';
-import AuthLayout from '../components/auth/AuthLayout';
-import RegisterForm from '../components/auth/RegisterForm';
-import Button from '../components/ui/Button';
-import { registerRequest } from '../api/auth'; // 👈 importa la función real
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../App";
+import AuthLayout from "../components/auth/AuthLayout";
+import RegisterForm from "../components/auth/RegisterForm";
+import Button from "../components/ui/Button";
+import { registerRequest } from "../api/auth"; // 👈 importa la función real
 
 const Register = () => {
   const [loading, setLoading] = useState(false);
@@ -16,9 +16,9 @@ const Register = () => {
     try {
       const response = await registerRequest(formData); // llamada real
       login(response.user); // guarda usuario en contexto
-      navigate('/dashboard');
+      navigate("/dashboard");
     } catch (error) {
-      console.error('Error al registrar:', error);
+      console.error("Error al registrar:", error);
       alert(error.message);
     } finally {
       setLoading(false);
@@ -31,14 +31,16 @@ const Register = () => {
       subtitle="Únete a nuestra comunidad de amantes de las mascotas"
     >
       <RegisterForm onSubmit={handleRegister} loading={loading} />
-      
+
       <div className="mt-6">
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-gray-300" />
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white text-gray-500">¿Ya tienes cuenta?</span>
+            <span className="px-2 bg-[#f8f9fa] text-gray-500">
+              ¿Ya tienes cuenta?
+            </span>
           </div>
         </div>
 
@@ -46,7 +48,7 @@ const Register = () => {
           <Button
             variant="outline"
             className="w-full"
-            onClick={() => navigate('/login')}
+            onClick={() => navigate("/login")}
           >
             Iniciar sesión
           </Button>
@@ -54,8 +56,8 @@ const Register = () => {
       </div>
 
       <div className="mt-6 text-center">
-        <Link 
-          to="/" 
+        <Link
+          to="/"
           className="text-sm text-primary-500 hover:text-primary-600 transition-colors"
         >
           ← Volver al inicio
