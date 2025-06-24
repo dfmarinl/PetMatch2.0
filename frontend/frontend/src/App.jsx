@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { useState, createContext, useContext } from "react";
+import { useState, createContext, useContext, useEffect } from "react";
 import LandingPage from "./Pages/LandingPage";
 import Login from "./Pages/Login";
 import Register from "./Pages/Register";
@@ -23,14 +23,60 @@ export const useAuth = () => {
 
 function App() {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true); // Estado de carga inicial
+
+  // Efecto para recuperar el usuario del localStorage al cargar la app
+  useEffect(() => {
+    const checkAuthStatus = () => {
+      try {
+        const savedUser = localStorage.getItem('user');
+        const savedToken = localStorage.getItem('token');
+        
+        if (savedUser && savedToken) {
+          const userData = JSON.parse(savedUser);
+          setUser({ ...userData, token: savedToken });
+        }
+      } catch (error) {
+        console.error('Error recuperando datos de autenticación:', error);
+        // Limpiar datos corruptos
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkAuthStatus();
+  }, []);
 
   const login = (userData) => {
     setUser(userData);
+    // Guardar en localStorage
+    if (userData.token) {
+      localStorage.setItem('token', userData.token);
+      // Guardar usuario sin el token para evitar duplicación
+      const { token, ...userWithoutToken } = userData;
+      localStorage.setItem('user', JSON.stringify(userWithoutToken));
+    } else {
+      localStorage.setItem('user', JSON.stringify(userData));
+    }
   };
 
   const logout = () => {
     setUser(null);
+    // Limpiar localStorage
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
   };
+
+  // Mostrar una pantalla de carga mínima mientras se verifica la autenticación
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
   return (
     <AuthContext.Provider value={{ user, login, logout }}>

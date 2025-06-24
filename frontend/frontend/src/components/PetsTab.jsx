@@ -4,14 +4,14 @@ import { Plus, BarChart3, XCircle } from 'lucide-react';
 import SearchAndFilters from './SearchAndFilters';
 import PetsTable from './PetsTable';
 
-const PetsTab = ({ 
-  pets, 
-  loading, 
-  error, 
-  onCreatePet, 
-  onEditPet, 
-  onViewPet, 
-  onDeletePet, 
+const PetsTab = ({
+  pets,
+  loading,
+  error,
+  onCreatePet,
+  onEditPet,
+  onViewPet,
+  onDeletePet,
   onRefresh,
   searchTerm,
   setSearchTerm,
@@ -22,9 +22,26 @@ const PetsTab = ({
   showFilters,
   setShowFilters
 }) => {
+  // Filtro combinado
+  const filteredPets = pets
+    .filter((pet) => {
+      if (filterStatus === 'available') return pet.available === true;
+      if (filterStatus === 'adopted') return pet.available === false;
+      return true;
+    })
+    .filter((pet) => {
+      if (filterType !== 'all') {
+        return pet.species?.toLowerCase() === filterType.toLowerCase();
+      }
+      return true;
+    })
+    .filter((pet) =>
+      pet.name?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
   return (
     <div className="space-y-6">
-      {/* Header with Search and Add Button */}
+      {/* Header con título y botones */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
         <h2 className="text-2xl font-bold text-gray-900">Gestión de Mascotas</h2>
         <div className="flex space-x-2">
@@ -46,7 +63,7 @@ const PetsTab = ({
         </div>
       </div>
 
-      {/* API Error Display */}
+      {/* Mensaje de error */}
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <div className="flex items-center">
@@ -62,7 +79,7 @@ const PetsTab = ({
         </div>
       )}
 
-      {/* Search and Filter */}
+      {/* Filtros y búsqueda */}
       <SearchAndFilters
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
@@ -75,14 +92,11 @@ const PetsTab = ({
         placeholder="Buscar mascotas..."
       />
 
-      {/* Pets Table */}
+      {/* Tabla de mascotas filtradas */}
       <PetsTable
-        pets={pets}
+        pets={filteredPets}
         loading={loading}
         error={error}
-        searchTerm={searchTerm}
-        filterStatus={filterStatus}
-        filterType={filterType}
         onCreatePet={onCreatePet}
         onEditPet={onEditPet}
         onViewPet={onViewPet}
