@@ -1,19 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { X, AlertCircle } from 'lucide-react';
-import { uploadPetImage } from '../../api/petImage';
-import { registerPet, updatePet } from '../../api/pet';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { X, AlertCircle } from "lucide-react";
+import { uploadPetImage } from "../../api/petImage";
+import { registerPet, updatePet } from "../../api/pet";
+import { useNavigate } from "react-router-dom";
 
 const PetModal = ({ isOpen, onClose, pet, loading = false }) => {
   const [formData, setFormData] = useState({
-    name: '',
-    species: '',
-    breed: '',
-    age: '',
-    gender: '',
-    description: '',
+    name: "",
+    species: "",
+    breed: "",
+    age: "",
+    gender: "",
+    description: "",
     available: true,
-    image: ''
+    image: "",
   });
   const [errors, setErrors] = useState({});
   const [imagePreview, setImagePreview] = useState(null);
@@ -23,27 +23,27 @@ const PetModal = ({ isOpen, onClose, pet, loading = false }) => {
   useEffect(() => {
     if (pet) {
       setFormData({
-        name: pet.name || '',
-        species: pet.species || '',
-        breed: pet.breed || '',
-        age: pet.age || '',
-        gender: pet.gender || '',
-        description: pet.description || '',
+        name: pet.name || "",
+        species: pet.species || "",
+        breed: pet.breed || "",
+        age: pet.age || "",
+        gender: pet.gender || "",
+        description: pet.description || "",
         available: pet.available !== undefined ? pet.available : true,
-        image: pet.image || ''
+        image: pet.image || "",
       });
       setImagePreview(pet.image || null);
       setImageFile(null);
     } else {
       setFormData({
-        name: '',
-        species: '',
-        breed: '',
-        age: '',
-        gender: '',
-        description: '',
+        name: "",
+        species: "",
+        breed: "",
+        age: "",
+        gender: "",
+        description: "",
         available: true,
-        image: ''
+        image: "",
       });
       setImagePreview(null);
       setImageFile(null);
@@ -53,12 +53,13 @@ const PetModal = ({ isOpen, onClose, pet, loading = false }) => {
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.name.trim()) newErrors.name = 'El nombre es requerido';
-    if (!formData.species) newErrors.species = 'La especie es requerida';
-    if (!formData.age || formData.age < 0) newErrors.age = 'Edad inválida';
-    if (!formData.gender) newErrors.gender = 'El género es requerido';
-    if (!formData.description.trim()) newErrors.description = 'La descripción es requerida';
-    if (!imagePreview) newErrors.image = 'La imagen es requerida';
+    if (!formData.name.trim()) newErrors.name = "El nombre es requerido";
+    if (!formData.species) newErrors.species = "La especie es requerida";
+    if (!formData.age || formData.age < 0) newErrors.age = "Edad inválida";
+    if (!formData.gender) newErrors.gender = "El género es requerido";
+    if (!formData.description.trim())
+      newErrors.description = "La descripción es requerida";
+    if (!imagePreview) newErrors.image = "La imagen es requerida";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -77,22 +78,22 @@ const PetModal = ({ isOpen, onClose, pet, loading = false }) => {
       const petPayload = {
         ...formData,
         age: parseInt(formData.age, 10),
-        image: imageUrl
+        image: imageUrl,
       };
 
       if (pet) {
         await updatePet(pet.id, petPayload);
-        alert('Mascota actualizada exitosamente');
+        alert("Mascota actualizada exitosamente");
       } else {
         await registerPet(petPayload);
-        alert('Mascota registrada exitosamente');
+        alert("Mascota registrada exitosamente");
       }
 
       onClose();
-      navigate('/admin');
+      navigate("/admin");
     } catch (error) {
-      console.error('Error al guardar la mascota:', error);
-      alert('Hubo un error. Intenta nuevamente.');
+      console.error("Error al guardar la mascota:", error);
+      alert("Hubo un error. Intenta nuevamente.");
     }
   };
 
@@ -100,15 +101,15 @@ const PetModal = ({ isOpen, onClose, pet, loading = false }) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === "checkbox" ? checked : value,
     }));
     if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: '' }));
+      setErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
 
   const handleImageUpload = (file) => {
-    if (file && file.type.startsWith('image/')) {
+    if (file && file.type.startsWith("image/")) {
       setImageFile(file);
       const reader = new FileReader();
       reader.onload = (e) => setImagePreview(e.target.result);
@@ -124,38 +125,55 @@ const PetModal = ({ isOpen, onClose, pet, loading = false }) => {
   const removeImage = () => {
     setImagePreview(null);
     setImageFile(null);
-    setFormData((prev) => ({ ...prev, image: '' }));
+    setFormData((prev) => ({ ...prev, image: "" }));
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
         <div className="flex items-center justify-between p-6 border-b">
           <h2 className="text-xl font-semibold text-gray-900">
-            {pet ? 'Editar Mascota' : 'Registrar Nueva Mascota'}
+            {pet ? "Editar Mascota" : "Registrar Nueva Mascota"}
           </h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600 transition-colors"
+          >
             <X size={24} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="overflow-y-auto max-h-[calc(90vh-140px)] p-6 space-y-4">
+        <form
+          onSubmit={handleSubmit}
+          className="overflow-y-auto max-h-[calc(90vh-140px)] p-6 space-y-4"
+        >
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Nombre *
+            </label>
             <input
               name="name"
               value={formData.name}
               onChange={handleChange}
-              className={`w-full px-3 py-2 border rounded-lg ${errors.name ? 'border-red-500' : 'border-gray-300'}`}
+              className={`w-full px-3 py-2 border rounded-lg ${
+                errors.name ? "border-red-500" : "border-gray-300"
+              }`}
               placeholder="Nombre de la mascota"
             />
-            {errors.name && <p className="text-sm text-red-600"><AlertCircle size={14} className="inline mr-1" />{errors.name}</p>}
+            {errors.name && (
+              <p className="text-sm text-red-600">
+                <AlertCircle size={14} className="inline mr-1" />
+                {errors.name}
+              </p>
+            )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Especie *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Especie *
+            </label>
             <select
               name="species"
               value={formData.species}
@@ -169,11 +187,18 @@ const PetModal = ({ isOpen, onClose, pet, loading = false }) => {
               <option value="Ave">Ave</option>
               <option value="Otro">Otro</option>
             </select>
-            {errors.species && <p className="text-sm text-red-600"><AlertCircle size={14} className="inline mr-1" />{errors.species}</p>}
+            {errors.species && (
+              <p className="text-sm text-red-600">
+                <AlertCircle size={14} className="inline mr-1" />
+                {errors.species}
+              </p>
+            )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Raza</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Raza
+            </label>
             <input
               name="breed"
               value={formData.breed}
@@ -184,20 +209,31 @@ const PetModal = ({ isOpen, onClose, pet, loading = false }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Edad (años) *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Edad (años) *
+            </label>
             <input
               type="number"
               name="age"
               value={formData.age}
               onChange={handleChange}
-              className={`w-full px-3 py-2 border rounded-lg ${errors.age ? 'border-red-500' : 'border-gray-300'}`}
+              className={`w-full px-3 py-2 border rounded-lg ${
+                errors.age ? "border-red-500" : "border-gray-300"
+              }`}
               placeholder="Edad"
             />
-            {errors.age && <p className="text-sm text-red-600"><AlertCircle size={14} className="inline mr-1" />{errors.age}</p>}
+            {errors.age && (
+              <p className="text-sm text-red-600">
+                <AlertCircle size={14} className="inline mr-1" />
+                {errors.age}
+              </p>
+            )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Género *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Género *
+            </label>
             <select
               name="gender"
               value={formData.gender}
@@ -208,20 +244,34 @@ const PetModal = ({ isOpen, onClose, pet, loading = false }) => {
               <option value="male">Macho</option>
               <option value="female">Hembra</option>
             </select>
-            {errors.gender && <p className="text-sm text-red-600"><AlertCircle size={14} className="inline mr-1" />{errors.gender}</p>}
+            {errors.gender && (
+              <p className="text-sm text-red-600">
+                <AlertCircle size={14} className="inline mr-1" />
+                {errors.gender}
+              </p>
+            )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Descripción *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Descripción *
+            </label>
             <textarea
               name="description"
               value={formData.description}
               onChange={handleChange}
               rows={3}
-              className={`w-full px-3 py-2 border rounded-lg ${errors.description ? 'border-red-500' : 'border-gray-300'}`}
+              className={`w-full px-3 py-2 border rounded-lg ${
+                errors.description ? "border-red-500" : "border-gray-300"
+              }`}
               placeholder="Describe la mascota"
             />
-            {errors.description && <p className="text-sm text-red-600"><AlertCircle size={14} className="inline mr-1" />{errors.description}</p>}
+            {errors.description && (
+              <p className="text-sm text-red-600">
+                <AlertCircle size={14} className="inline mr-1" />
+                {errors.description}
+              </p>
+            )}
           </div>
 
           <div className="flex items-center gap-2">
@@ -235,14 +285,21 @@ const PetModal = ({ isOpen, onClose, pet, loading = false }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Fotografía *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Fotografía *
+            </label>
             <input
               type="file"
               accept="image/*"
               onChange={handleFileInput}
               className="w-full"
             />
-            {errors.image && <p className="text-sm text-red-600"><AlertCircle size={14} className="inline mr-1" />{errors.image}</p>}
+            {errors.image && (
+              <p className="text-sm text-red-600">
+                <AlertCircle size={14} className="inline mr-1" />
+                {errors.image}
+              </p>
+            )}
             {imagePreview && (
               <div className="mt-2 relative">
                 <img
@@ -274,7 +331,11 @@ const PetModal = ({ isOpen, onClose, pet, loading = false }) => {
               disabled={loading}
               className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 disabled:opacity-50"
             >
-              {loading ? 'Guardando...' : (pet ? 'Actualizar Mascota' : 'Registrar Mascota')}
+              {loading
+                ? "Guardando..."
+                : pet
+                ? "Actualizar Mascota"
+                : "Registrar Mascota"}
             </button>
           </div>
         </form>
@@ -284,4 +345,3 @@ const PetModal = ({ isOpen, onClose, pet, loading = false }) => {
 };
 
 export default PetModal;
-

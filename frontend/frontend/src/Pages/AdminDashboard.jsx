@@ -1,30 +1,30 @@
-import React, { useState, useEffect } from 'react';
-import { getAllPets } from '../api/pet';
-import { getAllUsers, deleteUser, updateUser } from '../api/users';
-import { getAllRequests, updateRequestStatus } from '../api/requests';
-import { useAuth } from '../App';
+import React, { useState, useEffect } from "react";
+import { getAllPets } from "../api/pet";
+import { getAllUsers, deleteUser, updateUser } from "../api/users";
+import { getAllRequests, updateRequestStatus } from "../api/requests";
+import { useAuth } from "../App";
 
 // Components
-import Header from '../components/Header';
-import NavigationTabs from '../components/NavigationTabs';
-import OverviewTab from '../components/OverviewTab';
-import PetsTab from '../components/PetsTab';
-import RequestsTab from '../components/RequestsTab';
-import UsersTab from '../components/UsersTab';
+import Header from "../components/Header";
+import NavigationTabs from "../components/NavigationTabs";
+import OverviewTab from "../components/OverviewTab";
+import PetsTab from "../components/PetsTab";
+import RequestsTab from "../components/RequestsTab";
+import UsersTab from "../components/UsersTab";
 
 // Modals
-import PetModal from '../components/Modales/PetModal';
-import PetDetailsModal from '../components/Modales/PetDetailsModal';
-import DeleteConfirmModal from '../components/Modales/DeleteConfirmModal';
+import PetModal from "../components/Modales/PetModal";
+import PetDetailsModal from "../components/Modales/PetDetailsModal";
+import DeleteConfirmModal from "../components/Modales/DeleteConfirmModal";
 
-import UserModal from '../components/Modales/UserModal';
-import UserDetailsModal from '../components/Modales/UserDetailsModal';
-import DeleteUserConfirmModal from '../components/Modales/DeleteUserConfirmModal';
+import UserModal from "../components/Modales/UserModal";
+import UserDetailsModal from "../components/Modales/UserDetailsModal";
+import DeleteUserConfirmModal from "../components/Modales/DeleteUserConfirmModal";
 
 const AdminDashboard = () => {
   const { user, logout } = useAuth();
 
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState("overview");
 
   // Pets
   const [apiPets, setApiPets] = useState([]);
@@ -53,9 +53,9 @@ const AdminDashboard = () => {
   const [selectedPet, setSelectedPet] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
 
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all');
-  const [filterType, setFilterType] = useState('all');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [filterType, setFilterType] = useState("all");
   const [showFilters, setShowFilters] = useState(false);
 
   const fetchApiPets = async () => {
@@ -64,7 +64,10 @@ const AdminDashboard = () => {
       const response = await getAllPets();
       setApiPets(response || []);
     } catch (error) {
-      setApiError('Error al cargar las mascotas desde la API',error);
+
+      setApiError("Error al cargar las mascotas desde la API");
+
+
       setApiPets([]);
     } finally {
       setApiLoading(false);
@@ -77,7 +80,9 @@ const AdminDashboard = () => {
       const response = await getAllUsers();
       setApiUsers(response || []);
     } catch (error) {
-      setApiUsersError('Error al cargar los usuarios desde la API',error);
+
+      setApiUsersError("Error al cargar los usuarios desde la API");
+
       setApiUsers([]);
     } finally {
       setApiUsersLoading(false);
@@ -90,7 +95,9 @@ const AdminDashboard = () => {
       const response = await getAllRequests();
       setAdoptionRequests(response || []);
     } catch (error) {
-      setAdoptionError('Error al cargar solicitudes de adopción',error);
+
+      setAdoptionError("Error al cargar solicitudes de adopción");
+
     } finally {
       setAdoptionLoading(false);
     }
@@ -101,17 +108,17 @@ const AdminDashboard = () => {
       await updateRequestStatus(requestId, status, observations);
       await fetchAdoptionRequests();
     } catch (error) {
-      console.error('Error al actualizar la solicitud:', error);
-      alert('No se pudo actualizar la solicitud');
+      console.error("Error al actualizar la solicitud:", error);
+      alert("No se pudo actualizar la solicitud");
     }
   };
 
   useEffect(() => {
-    fetchApiPets();              // Carga inicial de mascotas
-    fetchAdoptionRequests();  
-    if (activeTab === 'pets') fetchApiPets();
-    if (activeTab === 'users' && user?.rol !== 'empleado') fetchApiUsers();
-    if (activeTab === 'requests') fetchAdoptionRequests();
+    fetchApiPets(); // Carga inicial de mascotas
+    fetchAdoptionRequests();
+    if (activeTab === "pets") fetchApiPets();
+    if (activeTab === "users" && user?.rol !== "empleado") fetchApiUsers();
+    if (activeTab === "requests") fetchAdoptionRequests();
   }, [activeTab, user]);
 
   const handleCreatePet = () => {
@@ -153,7 +160,7 @@ const AdminDashboard = () => {
       setShowUserModal(false);
       await fetchApiUsers();
     } catch (error) {
-      console.error('Error al actualizar usuario:', error);
+      console.error("Error al actualizar usuario:", error);
     }
   };
 
@@ -166,7 +173,7 @@ const AdminDashboard = () => {
         await fetchApiUsers();
       }
     } catch (error) {
-      console.error('Error al eliminar usuario:', error);
+      console.error("Error al eliminar usuario:", error);
     }
   };
 
@@ -176,11 +183,21 @@ const AdminDashboard = () => {
     <div className="min-h-screen bg-gray-50">
       <Header user={user} onLogout={logout} />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <NavigationTabs activeTab={activeTab} setActiveTab={setActiveTab} userRole={user.rol} />
+        <NavigationTabs
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          userRole={user.rol}
+        />
 
-        {activeTab === 'overview' && <OverviewTab pets={apiPets} users={apiUsers} adoptionRequests={adoptionRequests} />}
+        {activeTab === "overview" && (
+          <OverviewTab
+            pets={apiPets}
+            users={apiUsers}
+            adoptionRequests={adoptionRequests}
+          />
+        )}
 
-        {activeTab === 'pets' && (
+        {activeTab === "pets" && (
           <PetsTab
             pets={apiPets}
             loading={apiLoading}
@@ -201,7 +218,7 @@ const AdminDashboard = () => {
           />
         )}
 
-        {activeTab === 'requests' && (
+        {activeTab === "requests" && (
           <RequestsTab
             requests={adoptionRequests}
             loading={adoptionLoading}
@@ -210,7 +227,7 @@ const AdminDashboard = () => {
           />
         )}
 
-        {activeTab === 'users' && user.rol !== 'empleado' && (
+        {activeTab === "users" && user.rol !== "empleado" && (
           <UsersTab
             users={apiUsers}
             loading={apiUsersLoading}
@@ -231,18 +248,52 @@ const AdminDashboard = () => {
       </div>
 
       {/* Modals */}
-      <PetModal isOpen={showPetModal} onClose={() => setShowPetModal(false)} onSubmit={handlePetSubmit} pet={selectedPet} loading={apiLoading} />
-      <PetDetailsModal isOpen={showDetailsModal} onClose={() => setShowDetailsModal(false)} pet={selectedPet} />
-      <DeleteConfirmModal isOpen={showDeleteModal} onClose={() => setShowDeleteModal(false)} petId={selectedPet?.id} petName={selectedPet?.name || ''} onDeleted={handleConfirmDelete} />
+      <PetModal
+        isOpen={showPetModal}
+        onClose={() => setShowPetModal(false)}
+        onSubmit={handlePetSubmit}
+        pet={selectedPet}
+        loading={apiLoading}
+      />
+      <PetDetailsModal
+        isOpen={showDetailsModal}
+        onClose={() => setShowDetailsModal(false)}
+        pet={selectedPet}
+      />
+      <DeleteConfirmModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        petId={selectedPet?.id}
+        petName={selectedPet?.name || ""}
+        onDeleted={handleConfirmDelete}
+      />
 
-      <UserModal isOpen={showUserModal} onClose={() => setShowUserModal(false)} onSubmit={handleUserSubmit} user={selectedUser} />
-      <UserDetailsModal isOpen={showUserDetailsModal} onClose={() => setShowUserDetailsModal(false)} user={selectedUser} />
-      <DeleteUserConfirmModal isOpen={showDeleteUserModal} onClose={() => setShowDeleteUserModal(false)} userName={`${selectedUser?.firstName} ${selectedUser?.lastName}`} onConfirm={handleConfirmDeleteUser} />
+      <UserModal
+        isOpen={showUserModal}
+        onClose={() => setShowUserModal(false)}
+        onSubmit={handleUserSubmit}
+        user={selectedUser}
+      />
+      <UserDetailsModal
+        isOpen={showUserDetailsModal}
+        onClose={() => setShowUserDetailsModal(false)}
+        user={selectedUser}
+      />
+      <DeleteUserConfirmModal
+        isOpen={showDeleteUserModal}
+        onClose={() => setShowDeleteUserModal(false)}
+        userName={`${selectedUser?.firstName} ${selectedUser?.lastName}`}
+        onConfirm={handleConfirmDeleteUser}
+      />
+      {/* Footer */}
+      <footer className="bg-white border-t shadow-sm py-4 mt-auto">
+        <div className="max-w-7xl mx-auto px-4 text-center text-sm text-gray-500">
+          © 2025 PetMatch. Todos los derechos reservados. Desarrollado por el
+          equipo de PetMatch.
+        </div>
+      </footer>
     </div>
   );
 };
 
 export default AdminDashboard;
-
-
-

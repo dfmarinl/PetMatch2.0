@@ -49,9 +49,9 @@ const AdoptionRequestModal = ({ isOpen, onClose, pet }) => {
         otherPetsAtHome: false,
       });
       setTimeout(() => {
-      setMessage("");
-      onClose();
-    }, 1500);
+        setMessage("");
+        onClose();
+      }, 1500);
     } catch (error) {
       setMessage("Error al enviar la solicitud.");
       console.error(error);
@@ -61,7 +61,7 @@ const AdoptionRequestModal = ({ isOpen, onClose, pet }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
+    <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-lg relative">
         <button
           onClick={onClose}
@@ -146,7 +146,9 @@ const AdoptionRequestModal = ({ isOpen, onClose, pet }) => {
               checked={form.otherPetsAtHome}
               onChange={handleChange}
             />
-            <label htmlFor="otherPetsAtHome">¿Tienes otras mascotas en casa?</label>
+            <label htmlFor="otherPetsAtHome">
+              ¿Tienes otras mascotas en casa?
+            </label>
           </div>
 
           <button
@@ -173,4 +175,3 @@ const AdoptionRequestModal = ({ isOpen, onClose, pet }) => {
 };
 
 export default AdoptionRequestModal;
-
