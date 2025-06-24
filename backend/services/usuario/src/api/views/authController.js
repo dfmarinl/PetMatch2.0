@@ -6,6 +6,7 @@ const {
 } = require("../../../../../models");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const nodemailer = require("nodemailer");
 
 // Registro de usuario
 const register = async (req, res) => {
@@ -297,6 +298,100 @@ const updateProfile = async (req, res) => {
   }
 };
 
+//Enviar correo de recuperación
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const user = await User.findOne({ where: { email } });
+    if (!user)
+      return res.status(404).json({ message: "Usuario no encontrado" });
+
+    // Crear token de recuperación con vencimiento de 15 minutos
+    const resetToken = jwt.sign(
+      { userId: user.id },
+      process.env.JWT_SECRET_KEY,
+      { expiresIn: "15m" }
+    );
+
+    const resetLink = `http://localhost:5173/reset-password?token=${resetToken}`;
+
+    // Transportador configurado (Gmail + tolerancia a certificados autofirmados)
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+      tls: {
+        rejectUnauthorized: false, // ⚠️ Solo para entorno de desarrollo
+      },
+    });
+
+    // Enviar correo
+    await transporter.sendMail({
+      from: `"PetMatch" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: "Recuperación de contraseña - PetMatch",
+      html: `
+        <h3>Hola ${user.firstName},</h3>
+        <p>Recibimos una solicitud para restablecer tu contraseña. Si no fuiste tú, ignora este mensaje.</p>
+        <p><a href="${resetLink}" target="_blank">Haz clic aquí para restablecer tu contraseña</a></p>
+        <p>Este enlace expirará en 15 minutos.</p>
+      `,
+    });
+
+    res
+      .status(200)
+      .json({ message: "Correo enviado para restablecer la contraseña" });
+  } catch (error) {
+    console.error("Error en forgotPassword:", error);
+    res.status(500).json({
+      message: "Error al enviar el correo de recuperación",
+      error: error.message,
+    });
+  }
+};
+
+//Verifica el token enviado y actualiza la contraseña
+const resetPassword = async (req, res) => {
+  const { token, newPassword } = req.body;
+
+  try {
+    if (!token || !newPassword)
+      return res
+        .status(400)
+        .json({ message: "Token y nueva contraseña requeridos" });
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+
+    const user = await User.findByPk(decoded.userId);
+    if (!user)
+      return res.status(404).json({ message: "Usuario no encontrado" });
+
+    if (newPassword.length < 8) {
+      return res
+        .status(400)
+        .json({ message: "La contraseña debe tener al menos 8 caracteres" });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+
+    await user.save();
+
+    res.status(200).json({ message: "Contraseña actualizada exitosamente" });
+  } catch (error) {
+    console.error("Error en resetPassword:", error);
+    if (error.name === "TokenExpiredError") {
+      return res
+        .status(400)
+        .json({ message: "El enlace ha expirado. Solicita uno nuevo." });
+    }
+    res.status(500).json({ message: "Error al restablecer la contraseña" });
+  }
+};
+
 module.exports = {
   register,
   login,
@@ -304,4 +399,6 @@ module.exports = {
   verifyCurrentPassword,
   updatePassword,
   updateProfile,
+  forgotPassword,
+  resetPassword,
 };

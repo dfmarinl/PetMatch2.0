@@ -225,7 +225,7 @@ const Dashboard = () => {
                   </span>
                 </div>
                 <p className="text-gray-600 text-sm mb-2">
-                  {pet.breed} • {pet.age || "Edad no disponible"}
+                  {pet.breed} • {pet.age + " años" || "Edad no disponible"}
                 </p>
                 <p className="text-gray-600 text-sm mb-4">{pet.description}</p>
                 <div className="flex flex-col sm:flex-row gap-2">
@@ -284,6 +284,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-
-
-
