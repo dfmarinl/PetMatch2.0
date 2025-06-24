@@ -36,7 +36,8 @@ const PetsCatalog = () => {
 
   const openAdoptionModal = (pet) => {
     setPetToAdopt(pet);
-    setIsAdoptionModalOpen(true);
+    navigate("/login")
+    //setIsAdoptionModalOpen(true);
   };
 
   const closeAdoptionModal = () => {
