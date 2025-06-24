@@ -1,5 +1,5 @@
 import React from "react";
-import { Heart, User, Bell, LogOut } from "lucide-react";
+import { User, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const Header = ({ user }) => {
@@ -21,9 +21,7 @@ const Header = ({ user }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
-            <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-              <Heart className="w-4 h-4 text-white fill-current" />
-            </div>
+            <img src="/dog.png" alt="Logo" className="w-6 h-6 object-contain" />
             <span className="ml-2 text-xl font-bold text-gray-900">
               PetMatch {getRoleLabel(user?.rol)}
             </span>
@@ -61,3 +59,5 @@ const Header = ({ user }) => {
 };
 
 export default Header;
+
+

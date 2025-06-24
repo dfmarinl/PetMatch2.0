@@ -8,7 +8,6 @@ import {
 import UpdateProfileModal from "../components/Modales/UpdateProfileModal";
 import UpdatePasswordModal from "../components/Modales/UpdatePasswordModal";
 import {
-  Heart,
   User,
   Settings,
   Lock,
@@ -86,9 +85,7 @@ const ClientProfile = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <div className="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center">
-                <Heart className="w-4 h-4 text-white fill-current" />
-              </div>
+              <img src="/dog.png" alt="Logo" className="w-6 h-6 object-contain" />
               <span className="ml-2 text-xl font-bold text-gray-900">
                 PetMatch
               </span>
@@ -142,35 +139,16 @@ const ClientProfile = () => {
               Información Personal
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700 text-center">
-              <p>
-                <strong>ID:</strong> {userData.id}
-              </p>
-              <p>
-                <strong>Nombre:</strong> {userData.firstName}{" "}
-                {userData.lastName}
-              </p>
-              <p>
-                <strong>Número de Identificación:</strong>{" "}
-                {userData.identificationNumber}
-              </p>
-              <p>
-                <strong>Edad:</strong> {userData.age}
-              </p>
-              <p>
-                <strong>Email:</strong> {userData.email}
-              </p>
-              <p>
-                <strong>Ciudad:</strong> {userData.city}
-              </p>
-              <p>
-                <strong>Dirección:</strong> {userData.direction}
-              </p>
-              <p>
-                <strong>Rol:</strong> {userData.rol}
-              </p>
+              <p><strong>ID:</strong> {userData.id}</p>
+              <p><strong>Nombre:</strong> {userData.firstName} {userData.lastName}</p>
+              <p><strong>Número de Identificación:</strong> {userData.identificationNumber}</p>
+              <p><strong>Edad:</strong> {userData.age}</p>
+              <p><strong>Email:</strong> {userData.email}</p>
+              <p><strong>Ciudad:</strong> {userData.city}</p>
+              <p><strong>Dirección:</strong> {userData.direction}</p>
+              <p><strong>Rol:</strong> {userData.rol}</p>
               <p className="md:col-span-2">
-                <strong>Registrado:</strong>{" "}
-                {new Date(userData.createdAt).toLocaleDateString()}
+                <strong>Registrado:</strong> {new Date(userData.createdAt).toLocaleDateString()}
               </p>
             </div>
           </div>
@@ -182,9 +160,7 @@ const ClientProfile = () => {
               className="p-6 border border-gray-200 rounded-lg hover:bg-gray-50 text-center"
             >
               <Settings className="w-6 h-6 mx-auto text-orange-500 mb-2" />
-              <p className="font-medium text-gray-900">
-                Actualizar Información Personal
-              </p>
+              <p className="font-medium text-gray-900">Actualizar Información Personal</p>
             </button>
             <button
               onClick={() => setIsPasswordModalOpen(true)}
@@ -285,4 +261,5 @@ const ClientProfile = () => {
 };
 
 export default ClientProfile;
+
 

@@ -1,6 +1,6 @@
 import { useAuth } from "../App";
 import { useNavigate } from "react-router-dom";
-import { Heart, User, LogOut } from "lucide-react";
+import { User, LogOut } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getAllPets } from "../api/pet";
 import { getMeRequest } from "../api/auth";
@@ -118,9 +118,7 @@ const Dashboard = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <div className="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center">
-                <Heart className="w-4 h-4 text-white fill-current" />
-              </div>
+              <img src="/dog.png" alt="Logo" className="w-6 h-6 object-contain" />
               <span className="ml-2 text-xl font-bold text-gray-900">
                 PetMatch
               </span>
@@ -284,3 +282,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
