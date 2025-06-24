@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../App";
 import { useNavigate } from "react-router-dom";
 import { getAllPets } from "../api/pet";
-import { Heart, User, LogOut } from "lucide-react";
+import { User, LogOut } from "lucide-react";
 import PetDetailsModal from "../components/Modales/PetDetailsModal";
 import AdoptionRequestModal from "../components/Modales/AdoptionRequestModal";
 
@@ -114,6 +114,7 @@ const PetsCatalog = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
+              <img src="/dog.png" alt="Logo" className="w-6 h-6 object-contain" />
               <span className="ml-2 text-xl font-bold text-white">
                 PetMatch
               </span>
@@ -235,7 +236,7 @@ const PetsCatalog = () => {
                     </span>
                   ) : (
                     <button
-                      onClick={() => navigate("/login")}
+                      onClick={() => openAdoptionModal(pet)}
                       className="flex-1 bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition-colors"
                     >
                       Adoptar
@@ -273,3 +274,4 @@ const PetsCatalog = () => {
 };
 
 export default PetsCatalog;
+
