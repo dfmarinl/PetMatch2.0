@@ -1,16 +1,15 @@
 import { Link } from 'react-router-dom';
-import { Heart, Shield, Users, Award, ArrowRight, Menu, X } from 'lucide-react';
+import { Shield, Users, Award, ArrowRight, Menu, X } from 'lucide-react';
 import { useState } from 'react';
-
 
 const LandingPage = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const features = [
-    { icon: Heart, title: "Adopción Responsable", description: "Conectamos mascotas con familias perfectas a través de un proceso cuidadoso y estructurado." },
-    { icon: Shield, title: "Proceso Seguro", description: "Verificamos cada solicitud para garantizar el bienestar y la seguridad de nuestras mascotas." },
-    { icon: Users, title: "Seguimiento Continuo", description: "Acompañamos a las familias después de la adopción para asegurar una transición exitosa." },
-    { icon: Award, title: "Compromiso de Calidad", description: "Trabajamos con refugios certificados y veterinarios especializados en bienestar animal." }
+    { icon: Shield, title: "Adopción Responsable", description: "Conectamos mascotas con familias perfectas a través de un proceso cuidadoso y estructurado." },
+    { icon: Users, title: "Proceso Seguro", description: "Verificamos cada solicitud para garantizar el bienestar y la seguridad de nuestras mascotas." },
+    { icon: Award, title: "Seguimiento Continuo", description: "Acompañamos a las familias después de la adopción para asegurar una transición exitosa." },
+    { icon: Shield, title: "Compromiso de Calidad", description: "Trabajamos con refugios certificados y veterinarios especializados en bienestar animal." }
   ];
 
   const stats = [
@@ -21,20 +20,16 @@ const LandingPage = () => {
   ];
 
   return (
-    <div
-      className="min-h-screen bg-cover bg-center bg-no-repeat"
-      style={{ backgroundImage: "url('/img/fondo.png')" }}
-    >
-      {/* Overlay para oscurecer la imagen y mejorar legibilidad */}
+    <div className="min-h-screen scroll-smooth bg-cover bg-center bg-no-repeat" style={{ backgroundImage: "url('/img/fondo.png')" }}>
       <div className="min-h-screen bg-white/60">
-
-        {/* Navigation */}
+        
+        {/* NAVBAR */}
         <nav className="bg-white/80 shadow-sm sticky top-0 z-50 backdrop-blur-sm">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
               <div className="flex items-center">
                 <div className="w-10 h-10 bg-primary-500 rounded-full flex items-center justify-center">
-                  <Heart className="w-6 h-6 text-white fill-current" />
+                  <img src="/dog.png" alt="Logo" className="w-6 h-6 object-contain" />
                 </div>
                 <span className="ml-2 text-xl font-bold text-gray-900/90">PetMatch</span>
               </div>
@@ -74,7 +69,7 @@ const LandingPage = () => {
           )}
         </nav>
 
-        {/* Hero Section */}
+        {/* HERO */}
         <section id="inicio" className="py-20 px-4 text-center">
           <div className="max-w-7xl mx-auto bg-white/80 rounded-xl p-10 backdrop-blur-sm">
             <h1 className="text-4xl md:text-6xl font-bold text-gray-900/90 mb-6">
@@ -88,18 +83,15 @@ const LandingPage = () => {
               <Link to="/register" className="bg-primary-500 text-black px-8 py-4 rounded-lg text-lg font-medium hover:bg-primary-600/90 transition-all transform hover:-translate-y-1 hover:shadow-lg inline-flex items-center justify-center">
                 Comenzar Adopción <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
-               <Link
-                to="/pets"
-                className="border border-primary-500 text-primary-500 px-8 py-4 rounded-lg text-lg font-medium hover:bg-primary-50 transition-colors inline-flex items-center justify-center"
-              >
+              <Link to="/pets" className="border border-primary-500 text-primary-500 px-8 py-4 rounded-lg text-lg font-medium hover:bg-primary-50 transition-colors inline-flex items-center justify-center">
                 Ver Mascotas
               </Link>
             </div>
           </div>
         </section>
 
-        {/* Stats Section */}
-        <section className="py-16 px-4">
+        {/* MASCOTAS */}
+        <section id="mascotas" className="py-16 px-4">
           <div className="max-w-7xl mx-auto bg-white/70 rounded-xl p-10">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
               {stats.map((stat, i) => (
@@ -112,8 +104,8 @@ const LandingPage = () => {
           </div>
         </section>
 
-        {/* Features Section */}
-        <section className="py-20 px-4">
+        {/* PROCESO */}
+        <section id="proceso" className="py-20 px-4">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16 bg-white/70 p-6 rounded-xl">
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900/90 mb-4">¿Por qué elegir PetMatch?</h2>
@@ -133,24 +125,24 @@ const LandingPage = () => {
           </div>
         </section>
 
-        {/* CTA */}
-        <section className="py-20 bg-primary-500/90 text-center text-white/90 px-4">
+        {/* CONTACTO */}
+        <section id="contacto" className="py-20 bg-primary-500/90 text-center text-white/90 px-4">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">¿Listo para cambiar una vida?</h2>
             <p className="text-xl mb-8">Miles de mascotas están esperando encontrar su hogar para siempre. Comienza tu proceso de adopción hoy mismo.</p>
             <Link to="/register" className="bg-black text-primary-500 px-8 py-4 rounded-lg text-lg font-medium hover:bg-white inline-flex items-center">
-              Adoptar Ahora <Heart className="ml-2 w-5 h-5 fill-current" />
+              Adoptar Ahora <img src="/dog.png" alt="Icono" className="ml-2 w-5 h-5 object-contain" />
             </Link>
           </div>
         </section>
 
-        {/* Footer */}
+        {/* FOOTER */}
         <footer className="bg-gray-900/90 text-white/90 py-12">
           <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-8 px-4 sm:px-6 lg:px-8">
             <div>
               <div className="flex items-center mb-4">
                 <div className="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center">
-                  <Heart className="w-4 h-4 text-white fill-current" />
+                  <img src="/dog.png" alt="Logo" className="w-4 h-4 object-contain" />
                 </div>
                 <span className="ml-2 text-lg font-bold">PetMatch</span>
               </div>
@@ -192,3 +184,5 @@ const LandingPage = () => {
 };
 
 export default LandingPage;
+
+
