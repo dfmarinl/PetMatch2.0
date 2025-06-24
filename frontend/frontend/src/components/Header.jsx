@@ -17,12 +17,12 @@ const Header = ({ user }) => {
   };
 
   return (
-    <header className="bg-white shadow-sm border-b">
+    <header className="bg-[#1f2937] shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
             <img src="/dog.png" alt="Logo" className="w-6 h-6 object-contain" />
-            <span className="ml-2 text-xl font-bold text-gray-900">
+            <span className="ml-2 text-xl font-bold text-white">
               PetMatch {getRoleLabel(user?.rol)}
             </span>
           </div>
@@ -37,10 +37,10 @@ const Header = ({ user }) => {
               className="flex items-center space-x-2 cursor-pointer hover:opacity-80 transition-opacity"
               title="Ir a Mi Perfil"
             >
-              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                <User className="w-4 h-4 text-blue-500" />
+              <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+                <User className="w-4 h-4 text-gray-700" />
               </div>
-              <span className="text-sm font-medium text-gray-700">
+              <span className="text-sm font-medium text-white">
                 {user?.firstName}
               </span>
             </div>
@@ -59,5 +59,3 @@ const Header = ({ user }) => {
 };
 
 export default Header;
-
-
