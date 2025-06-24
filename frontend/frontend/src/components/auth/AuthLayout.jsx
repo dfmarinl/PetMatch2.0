@@ -4,7 +4,7 @@ const AuthLayout = ({ children, title, subtitle }) => {
   return (
     <div
       className="min-h-screen bg-cover bg-center bg-no-repeat"
-      style={{ backgroundImage: "url('/img/fondo.png')" }} // asegúrate que fondo.png esté en /public/img/
+      style={{ backgroundImage: "url('/img/pet5.jpg')" }} // asegúrate que fondo.png esté en /public/img/
     >
       <div className="min-h-screen bg-white/70 backdrop-blur-sm flex flex-col justify-center py-12 sm:px-6 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
