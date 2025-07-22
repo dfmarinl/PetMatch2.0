@@ -9,6 +9,7 @@ import PetRegistration from "./Pages/PetRegistration";
 import PetsCatalog from "./Pages/PetsCatalog";
 import ClientProfile from "./pages/ClientProfile";
 import StaffProfile from "./pages/StaffProfile";
+import ResetPasswordForm from "./components/auth/ResetPasswordForm";
 
 // Context para manejar el estado del usuario
 const AuthContext = createContext();
@@ -92,6 +93,8 @@ function App() {
             <Route path="/pets" element={<PetsCatalog />} />
             <Route path="/profile" element={<ClientProfile />} />
             <Route path="/staff-profile" element={<StaffProfile />} />
+            <Route path="/reset-password" element={<ResetPasswordForm />} />
+
           </Routes>
         </div>
       </Router>

@@ -329,18 +329,24 @@ const forgotPassword = async (req, res) => {
     });
 
     // Enviar correo
-    await transporter.sendMail({
-      from: `"PetMatch" <${process.env.EMAIL_USER}>`,
-      to: email,
-      subject: "Recuperación de contraseña - PetMatch",
-      html: `
-        <h3>Hola ${user.firstName},</h3>
-        <p>Recibimos una solicitud para restablecer tu contraseña. Si no fuiste tú, ignora este mensaje.</p>
-        <p><a href="${resetLink}" target="_blank">Haz clic aquí para restablecer tu contraseña</a></p>
-        <p>Este enlace expirará en 15 minutos.</p>
-      `,
-    });
-
+   await transporter.sendMail({
+  from: `"PetMatch" <${process.env.EMAIL_USER}>`,
+  to: email,
+  subject: "Recuperación de contraseña - PetMatch",
+  html: `
+    <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px;">
+      <img src="https://res.cloudinary.com/djcnay2fx/image/upload/v1753202572/logo_fpycut.jpg" alt="Logo" width="100" />
+      <h1>¡Hola de nuevo, ${user.firstName}!</h1>
+      <p>Recibimos una solicitud para restablecer tu contraseña. Si no fuiste tú, ignora este mensaje.</p>
+      <a href="${resetLink}" style="display: inline-block; padding: 15px 30px; background-color: #ff5733; color: white; font-weight: bold; text-decoration: none; border-radius: 25px; margin-top: 20px;">
+        Recuperar contraseña
+      </a>
+      <p style="margin-top: 30px;">Este enlace es válido durante 15 minutos.</p>
+      <p><strong>¿No solicitaste esto?</strong></p>
+      <p>Ignora este correo si no pediste restablecer tu contraseña.</p>
+    </div>
+  `,
+});
     res
       .status(200)
       .json({ message: "Correo enviado para restablecer la contraseña" });

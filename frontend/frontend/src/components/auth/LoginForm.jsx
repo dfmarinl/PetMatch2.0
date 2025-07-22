@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import Input from '../ui/Input';
 import Button from '../ui/Button';
+import RecoverPasswordForm from './RecoverPasswordForm';
+import { forgotPasswordRequest } from '../../api/auth'; // 👈 importa la función real
 
 const LoginForm = ({ onSubmit, loading = false }) => {
   const [formData, setFormData] = useState({
@@ -10,22 +12,23 @@ const LoginForm = ({ onSubmit, loading = false }) => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
+  const [recoverMode, setRecoverMode] = useState(false);
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!formData.email) {
       newErrors.email = 'El email es requerido';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'El email no es válido';
     }
-    
+
     if (!formData.password) {
       newErrors.password = 'La contraseña es requerida';
     } else if (formData.password.length < 6) {
       newErrors.password = 'La contraseña debe tener al menos 6 caracteres';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -43,7 +46,6 @@ const LoginForm = ({ onSubmit, loading = false }) => {
       ...prev,
       [name]: value
     }));
-    // Limpiar error cuando el usuario empiece a escribir
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
@@ -51,6 +53,29 @@ const LoginForm = ({ onSubmit, loading = false }) => {
       }));
     }
   };
+
+  if (recoverMode) {
+    return (
+      <div>
+        <RecoverPasswordForm
+          onSubmit={async ({ email }) => {
+            // 🔗 Integración real con tu API
+            await forgotPasswordRequest(email);
+          }}
+          onSuccess={() => setRecoverMode(false)}
+        />
+        <div className="text-sm text-center mt-4">
+          <button
+            type="button"
+            className="text-primary-500 hover:text-primary-600"
+            onClick={() => setRecoverMode(false)}
+          >
+            ← Volver al inicio de sesión
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -98,6 +123,7 @@ const LoginForm = ({ onSubmit, loading = false }) => {
         <button
           type="button"
           className="text-sm text-primary-500 hover:text-primary-600 transition-colors"
+          onClick={() => setRecoverMode(true)}
         >
           ¿Olvidaste tu contraseña?
         </button>
@@ -105,7 +131,7 @@ const LoginForm = ({ onSubmit, loading = false }) => {
 
       <Button
         type="submit"
-        className="w-full  text-white bg-blue-600 hover:bg-blue-700"
+        className="w-full text-white bg-blue-600 hover:bg-blue-700"
         loading={loading}
       >
         Iniciar Sesión
@@ -115,3 +141,5 @@ const LoginForm = ({ onSubmit, loading = false }) => {
 };
 
 export default LoginForm;
+
+
