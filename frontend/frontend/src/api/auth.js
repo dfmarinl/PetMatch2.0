@@ -129,3 +129,33 @@ export const updateProfileRequest = async (userData) => {
     );
   }
 };
+
+export const forgotPasswordRequest = async (email) => {
+  try {
+    const response = await axios.post(
+      `${API_URL}/api/auth/forgot-password`,
+      { email }
+    );
+
+    return response.data; // Contiene el mensaje de éxito
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message || "Error al solicitar recuperación"
+    );
+  }
+};
+
+export const resetPasswordRequest = async (token, newPassword) => {
+  try {
+    const response = await axios.post(`${API_URL}/api/auth/reset-password`, {
+      token,
+      newPassword,
+    });
+
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message || 'Error al restablecer la contraseña'
+    );
+  }
+};
