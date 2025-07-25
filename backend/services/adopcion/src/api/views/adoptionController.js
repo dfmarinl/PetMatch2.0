@@ -5,7 +5,9 @@ const {
   User,
 } = require("../../../../../models");
 
-//Crear solicitud de adopción
+const { sendEmail } = require("../../../../utils/emailSender");
+
+// Crear solicitud de adopción
 const createAdoptionRequest = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -21,7 +23,6 @@ const createAdoptionRequest = async (req, res) => {
       otherPetsAtHome,
     } = req.body;
 
-    // Validación básica
     if (
       !petId ||
       !reasonForAdoption ||
@@ -31,7 +32,6 @@ const createAdoptionRequest = async (req, res) => {
       return res.status(400).json({ message: "Faltan campos requeridos." });
     }
 
-    // Verificar si la mascota está disponible
     const pet = await Pet.findByPk(petId);
     if (!pet || !pet.available) {
       return res
@@ -39,7 +39,6 @@ const createAdoptionRequest = async (req, res) => {
         .json({ message: "Mascota no disponible para adopción." });
     }
 
-    // Crear solicitud
     const newRequest = await AdoptionRequest.create({
       userId,
       petId,
@@ -59,13 +58,11 @@ const createAdoptionRequest = async (req, res) => {
     });
   } catch (error) {
     console.error("Error al crear solicitud:", error);
-    res
-      .status(500)
-      .json({ message: "Error al crear solicitud: " + error.message });
+    res.status(500).json({ message: "Error al crear solicitud: " + error.message });
   }
 };
 
-//Aprobar o rechazar una solicitud
+// Aprobar o rechazar una solicitud
 const updateAdoptionRequestStatus = async (req, res) => {
   try {
     const { id } = req.params;
@@ -75,23 +72,23 @@ const updateAdoptionRequestStatus = async (req, res) => {
       return res.status(400).json({ message: "Estado inválido." });
     }
 
-    const request = await AdoptionRequest.findByPk(id);
+    const request = await AdoptionRequest.findByPk(id, {
+      include: [{ model: User }, { model: Pet }],
+    });
+
     if (!request) {
       return res.status(404).json({ message: "Solicitud no encontrada." });
     }
 
-    // Actualizar estado y observaciones
     request.adoptionStatus = status;
     request.observations = observations || null;
     await request.save();
 
     if (status === "approved") {
-      // Calcular fecha aleatoria entre 3 y 15 días
       const daysToAdd = Math.floor(Math.random() * (15 - 3 + 1)) + 3;
       const deliveryDate = new Date();
       deliveryDate.setDate(deliveryDate.getDate() + daysToAdd);
 
-      // Crear la adopción completada
       await CompletedAdoption.create({
         approvalDate: new Date(),
         deliveryDate,
@@ -99,9 +96,23 @@ const updateAdoptionRequestStatus = async (req, res) => {
         adoptionRequestId: request.id,
       });
 
-      // Deshabilitar disponibilidad de la mascota
       const pet = await Pet.findByPk(request.petId);
       if (pet) await pet.update({ available: false });
+
+      // Enviar correo de aprobación
+      await sendEmail("adoptionApproved", request.User.email, {
+        userName: request.User.firstName,
+        petName: request.Pet.name,
+        deliveryDate,
+      });
+
+    } else if (status === "rejected") {
+      // Enviar correo de rechazo
+      await sendEmail("adoptionRejected", request.User.email, {
+        userName: request.User.firstName,
+        petName: request.Pet.name,
+        observations,
+      });
     }
 
     res
@@ -109,25 +120,17 @@ const updateAdoptionRequestStatus = async (req, res) => {
       .json({ message: "Estado de la solicitud actualizado correctamente." });
   } catch (error) {
     console.error("Error al actualizar solicitud:", error);
-    res
-      .status(500)
-      .json({ message: "Error al actualizar solicitud: " + error.message });
+    res.status(500).json({ message: "Error al actualizar solicitud: " + error.message });
   }
 };
 
-//obtener todas las solicitudes
+// Obtener todas las solicitudes
 const getAllRequests = async (req, res) => {
   try {
     const requests = await AdoptionRequest.findAll({
       include: [
-        {
-          model: Pet,
-          attributes: ["name"],
-        },
-        {
-          model: CompletedAdoption,
-          attributes: ["approvalDate", "deliveryDate"],
-        },
+        { model: Pet, attributes: ["name"] },
+        { model: CompletedAdoption, attributes: ["approvalDate", "deliveryDate"] },
       ],
       order: [["id", "DESC"]],
     });
@@ -135,13 +138,11 @@ const getAllRequests = async (req, res) => {
     res.status(200).json(requests);
   } catch (error) {
     console.error("Error al obtener todas las solicitudes:", error);
-    res
-      .status(500)
-      .json({ message: "Error al obtener solicitudes: " + error.message });
+    res.status(500).json({ message: "Error al obtener solicitudes: " + error.message });
   }
 };
 
-//Obtener solictudes por usuario
+// Obtener solicitudes por usuario
 const getRequestsByUser = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -164,13 +165,11 @@ const getRequestsByUser = async (req, res) => {
     res.status(200).json(requests);
   } catch (error) {
     console.error("Error al obtener solicitudes del usuario:", error);
-    res.status(500).json({
-      message: "Error al obtener solicitudes del usuario: " + error.message,
-    });
+    res.status(500).json({ message: "Error al obtener solicitudes del usuario: " + error.message });
   }
 };
 
-//Obtener todas las adopciones de un usuario
+// Obtener todas las adopciones de un usuario
 const getCompletedAdoptionsByUser = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -181,10 +180,7 @@ const getCompletedAdoptionsByUser = async (req, res) => {
           model: AdoptionRequest,
           where: { userId },
           include: [
-            {
-              model: Pet,
-              attributes: ["name", "species", "breed", "image"],
-            },
+            { model: Pet, attributes: ["name", "species", "breed", "image"] },
           ],
         },
       ],
@@ -194,13 +190,11 @@ const getCompletedAdoptionsByUser = async (req, res) => {
     res.status(200).json(adoptions);
   } catch (error) {
     console.error("Error al obtener adopciones completadas:", error);
-    res.status(500).json({
-      message: "Error al obtener adopciones completadas: " + error.message,
-    });
+    res.status(500).json({ message: "Error al obtener adopciones completadas: " + error.message });
   }
 };
 
-//Eliminar una solictud de adopción
+// Eliminar una solicitud de adopción
 const deleteAdoptionRequest = async (req, res) => {
   try {
     const { id } = req.params;
@@ -210,7 +204,7 @@ const deleteAdoptionRequest = async (req, res) => {
       where: {
         id,
         userId,
-        adoptionStatus: "pending", // Solo permitir eliminar si está pendiente
+        adoptionStatus: "pending",
       },
     });
 
@@ -224,13 +218,11 @@ const deleteAdoptionRequest = async (req, res) => {
     res.status(200).json({ message: "Solicitud eliminada correctamente." });
   } catch (error) {
     console.error("Error al eliminar solicitud:", error);
-    res
-      .status(500)
-      .json({ message: "Error al eliminar solicitud: " + error.message });
+    res.status(500).json({ message: "Error al eliminar solicitud: " + error.message });
   }
 };
 
-//Obtener todas las solicitudes paginadas
+// Obtener solicitudes paginadas
 const getRequestsPaginated = async (req, res) => {
   try {
     const { page = 1, limit = 10 } = req.query;
@@ -254,13 +246,11 @@ const getRequestsPaginated = async (req, res) => {
     });
   } catch (error) {
     console.error("Error al paginar solicitudes:", error);
-    res.status(500).json({
-      message: "Error al paginar solicitudes: " + error.message,
-    });
+    res.status(500).json({ message: "Error al paginar solicitudes: " + error.message });
   }
 };
 
-//Obtener todas las adopciones completadas
+// Obtener todas las adopciones completadas
 const getAllCompletedAdoptions = async (req, res) => {
   try {
     const completedAdoptions = await CompletedAdoption.findAll({
@@ -291,13 +281,11 @@ const getAllCompletedAdoptions = async (req, res) => {
     res.status(200).json(completedAdoptions);
   } catch (error) {
     console.error("Error al obtener adopciones completadas:", error);
-    res.status(500).json({
-      message: "Error al obtener adopciones completadas: " + error.message,
-    });
+    res.status(500).json({ message: "Error al obtener adopciones completadas: " + error.message });
   }
 };
 
-//Obtener todas las adopciones completadas paginadas
+// Obtener adopciones completadas paginadas
 const getCompletedAdoptionsPaginated = async (req, res) => {
   try {
     const { page = 1, limit = 10 } = req.query;
@@ -346,6 +334,7 @@ const getCompletedAdoptionsPaginated = async (req, res) => {
   }
 };
 
+// Obtener adopciones completadas por ID de usuario
 const getCompletedAdoptionsByUserId = async (req, res) => {
   try {
     const { userId } = req.params;
