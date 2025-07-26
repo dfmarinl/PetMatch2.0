@@ -11,9 +11,8 @@ const { sendEmail } = require("../../../../utils/emailSender");
 const createAdoptionRequest = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { petId } = req.body;
-
     const {
+      petId,
       reasonForAdoption,
       hadPetsBefore,
       dailyTimeForPet,
@@ -52,15 +51,44 @@ const createAdoptionRequest = async (req, res) => {
       adoptionStatus: "pending",
     });
 
+    const user = await User.findByPk(userId);
+
+    // Obtener empleados y administradores
+    const adminsAndEmployees = await User.findAll({
+      where: {
+        rol: ["empleado", "administrador"], // Importante: roles según tu modelo
+      },
+    });
+
+    const emails = adminsAndEmployees.map((u) => u.email);
+
+    console.log("Correos de empleados y administradores:", emails);
+
+    // Enviar correos en paralelo
+    await Promise.all(
+      emails.map((email) =>
+        sendEmail("newAdoptionRequest", email, {
+          userName: `${user.firstName} ${user.lastName}`,
+          petName: pet.name,
+          requestLink: "http://localhost:3000/admin/solicitudes", // Reemplaza con tu URL real si es necesario
+        })
+      )
+    );
+
     res.status(201).json({
       message: "Solicitud enviada correctamente",
       request: newRequest,
     });
   } catch (error) {
     console.error("Error al crear solicitud:", error);
-    res.status(500).json({ message: "Error al crear solicitud: " + error.message });
+    res
+      .status(500)
+      .json({ message: "Error al crear solicitud: " + error.message });
   }
 };
+
+
+
 
 // Aprobar o rechazar una solicitud
 const updateAdoptionRequestStatus = async (req, res) => {
