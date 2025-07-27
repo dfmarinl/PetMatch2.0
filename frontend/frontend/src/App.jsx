@@ -1,5 +1,10 @@
+
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useState, createContext, useContext, useEffect } from "react";
+import { Toaster, toast } from "react-hot-toast";
+import io from "socket.io-client";
+
+// Tus páginas
 import LandingPage from "./Pages/LandingPage";
 import Login from "./Pages/Login";
 import Register from "./Pages/Register";
@@ -11,7 +16,7 @@ import ClientProfile from "./pages/ClientProfile";
 import StaffProfile from "./pages/StaffProfile";
 import ResetPasswordPage from "./Pages/ResetPasswordPage";
 
-// Context para manejar el estado del usuario
+// Contexto de autenticación
 const AuthContext = createContext();
 
 export const useAuth = () => {
@@ -22,24 +27,26 @@ export const useAuth = () => {
   return context;
 };
 
+// URL del backend
+const SOCKET_URL = "http://localhost:3001"; // ajusta si tu backend está en otro puerto/URL
+
 function App() {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); // Estado de carga inicial
+  const [loading, setLoading] = useState(true);
+  const [socket, setSocket] = useState(null);
 
-  // Efecto para recuperar el usuario del localStorage al cargar la app
   useEffect(() => {
     const checkAuthStatus = () => {
       try {
         const savedUser = localStorage.getItem('user');
         const savedToken = localStorage.getItem('token');
-        
+
         if (savedUser && savedToken) {
           const userData = JSON.parse(savedUser);
           setUser({ ...userData, token: savedToken });
         }
       } catch (error) {
         console.error('Error recuperando datos de autenticación:', error);
-        // Limpiar datos corruptos
         localStorage.removeItem('user');
         localStorage.removeItem('token');
       } finally {
@@ -50,12 +57,38 @@ function App() {
     checkAuthStatus();
   }, []);
 
+  useEffect(() => {
+    if (user) {
+      const newSocket = io(SOCKET_URL, {
+        auth: { token: user.token },
+      });
+
+      newSocket.on("connect", () => {
+        console.log("🔌 Socket conectado:", newSocket.id);
+      });
+
+      newSocket.on("receiveNotification", (data) => {
+        toast(data.message, {
+          icon: "🔔",
+        });
+      });
+
+      newSocket.on("disconnect", () => {
+        console.log("🔌 Socket desconectado");
+      });
+
+      setSocket(newSocket);
+
+      return () => {
+        newSocket.disconnect();
+      };
+    }
+  }, [user]);
+
   const login = (userData) => {
     setUser(userData);
-    // Guardar en localStorage
     if (userData.token) {
       localStorage.setItem('token', userData.token);
-      // Guardar usuario sin el token para evitar duplicación
       const { token, ...userWithoutToken } = userData;
       localStorage.setItem('user', JSON.stringify(userWithoutToken));
     } else {
@@ -65,12 +98,13 @@ function App() {
 
   const logout = () => {
     setUser(null);
-    // Limpiar localStorage
     localStorage.removeItem('user');
     localStorage.removeItem('token');
+    if (socket) {
+      socket.disconnect();
+    }
   };
 
-  // Mostrar una pantalla de carga mínima mientras se verifica la autenticación
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -83,6 +117,7 @@ function App() {
     <AuthContext.Provider value={{ user, login, logout }}>
       <Router>
         <div className="min-h-screen bg-gray-50">
+          <Toaster position="top-right" reverseOrder={false} />
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<Login />} />
@@ -94,7 +129,6 @@ function App() {
             <Route path="/profile" element={<ClientProfile />} />
             <Route path="/staff-profile" element={<StaffProfile />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
-
           </Routes>
         </div>
       </Router>

@@ -3,10 +3,12 @@ const {
   Pet,
   CompletedAdoption,
   User,
+  Notification,
 } = require("../../../../../models");
 
 const { sendEmail } = require("../../../../utils/emailSender");
 
+// Crear solicitud de adopción
 // Crear solicitud de adopción
 const createAdoptionRequest = async (req, res) => {
   try {
@@ -53,27 +55,45 @@ const createAdoptionRequest = async (req, res) => {
 
     const user = await User.findByPk(userId);
 
-    // Obtener empleados y administradores
+    // Notificación general para admins/empleados
+    const notificationMessage = `${user.firstName} ${user.lastName} ha enviado una nueva solicitud de adopción para ${pet.name}`;
+
+    // Crear notificación en la base de datos para admins
+    await Notification.create({
+      userId: null, // No es para un usuario específico
+      role: "admin", // Se envía a los administradores y empleados
+      message: notificationMessage,
+      type: "nuevaSolicitud",
+    });
+
+    // Enviar correos a administradores y empleados
     const adminsAndEmployees = await User.findAll({
       where: {
-        rol: ["empleado", "administrador"], // Importante: roles según tu modelo
+        rol: ["empleado", "administrador"],
       },
     });
 
     const emails = adminsAndEmployees.map((u) => u.email);
-
-    console.log("Correos de empleados y administradores:", emails);
-
-    // Enviar correos en paralelo
     await Promise.all(
       emails.map((email) =>
         sendEmail("newAdoptionRequest", email, {
           userName: `${user.firstName} ${user.lastName}`,
           petName: pet.name,
-          requestLink: "http://localhost:3000/admin/solicitudes", // Reemplaza con tu URL real si es necesario
+          requestLink: "http://localhost:3000/admin/solicitudes",
         })
       )
     );
+
+    // Emitir evento a canal general de admins/empleados
+    const io = req.app.get("io");
+    io.to("admins").emit("new_adoption_request", {
+      message: notificationMessage,
+      type: "nuevaSolicitud",
+      petId: pet.id,
+      userId: user.id,
+      requestId: newRequest.id,
+      createdAt: new Date(),
+    });
 
     res.status(201).json({
       message: "Solicitud enviada correctamente",
@@ -86,6 +106,10 @@ const createAdoptionRequest = async (req, res) => {
       .json({ message: "Error al crear solicitud: " + error.message });
   }
 };
+
+
+
+
 
 
 
