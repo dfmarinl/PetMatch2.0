@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import toast from "react-hot-toast";
+import { io } from "socket.io-client";
 import { getAllPets } from "../api/pet";
 import { getAllUsers, deleteUser, updateUser } from "../api/users";
 import { getAllRequests, updateRequestStatus } from "../api/requests";
@@ -16,14 +18,12 @@ import UsersTab from "../components/UsersTab";
 import PetModal from "../components/Modales/PetModal";
 import PetDetailsModal from "../components/Modales/PetDetailsModal";
 import DeleteConfirmModal from "../components/Modales/DeleteConfirmModal";
-
 import UserModal from "../components/Modales/UserModal";
 import UserDetailsModal from "../components/Modales/UserDetailsModal";
 import DeleteUserConfirmModal from "../components/Modales/DeleteUserConfirmModal";
 
 const AdminDashboard = () => {
   const { user, logout } = useAuth();
-
   const [activeTab, setActiveTab] = useState("overview");
 
   // Pets
@@ -40,12 +40,15 @@ const AdminDashboard = () => {
   const [adoptionRequests, setAdoptionRequests] = useState([]);
   const [adoptionLoading, setAdoptionLoading] = useState(false);
   const [adoptionError, setAdoptionError] = useState(null);
+  const prevRequestCount = useRef(0); // Para detectar nuevas solicitudes
+
+  // Socket.IO
+  const socketRef = useRef(null);
 
   // Modals
   const [showPetModal, setShowPetModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-
   const [showUserModal, setShowUserModal] = useState(false);
   const [showUserDetailsModal, setShowUserDetailsModal] = useState(false);
   const [showDeleteUserModal, setShowDeleteUserModal] = useState(false);
@@ -65,7 +68,6 @@ const AdminDashboard = () => {
       setApiPets(response || []);
     } catch (error) {
       setApiError("Error al cargar las mascotas desde la API");
-
       setApiPets([]);
     } finally {
       setApiLoading(false);
@@ -79,7 +81,6 @@ const AdminDashboard = () => {
       setApiUsers(response || []);
     } catch (error) {
       setApiUsersError("Error al cargar los usuarios desde la API");
-
       setApiUsers([]);
     } finally {
       setApiUsersLoading(false);
@@ -91,6 +92,7 @@ const AdminDashboard = () => {
     try {
       const response = await getAllRequests();
       setAdoptionRequests(response || []);
+
     } catch (error) {
       setAdoptionError("Error al cargar solicitudes de adopción");
     } finally {
@@ -104,12 +106,34 @@ const AdminDashboard = () => {
       await fetchAdoptionRequests();
     } catch (error) {
       console.error("Error al actualizar la solicitud:", error);
-      alert("No se pudo actualizar la solicitud");
+      toast.error("No se pudo actualizar la solicitud");
     }
   };
 
+  // Socket.IO: conexión para admins
   useEffect(() => {
-    fetchApiPets(); // Carga inicial de mascotas
+    if (!user) return;
+
+    socketRef.current = io("http://localhost:3001"); // Cambia la URL si es producción
+    socketRef.current.emit("join", "admins");
+
+    socketRef.current.on("new_adoption_request", (data) => {
+      toast.custom((t) => (
+        <div className={`bg-white p-4 shadow-md rounded-lg ${t.visible ? "animate-enter" : "animate-leave"}`}>
+          <strong>Nueva solicitud de adopción</strong>
+          <p>{data.userName} quiere adoptar a {data.petName}</p>
+        </div>
+      ));
+      fetchAdoptionRequests();
+    });
+
+    return () => {
+      socketRef.current.disconnect();
+    };
+  }, [user]);
+
+  useEffect(() => {
+    fetchApiPets();
     fetchAdoptionRequests();
     if (activeTab === "pets") fetchApiPets();
     if (activeTab === "users" && user?.rol !== "empleado") fetchApiUsers();
@@ -280,11 +304,11 @@ const AdminDashboard = () => {
         userName={`${selectedUser?.firstName} ${selectedUser?.lastName}`}
         onConfirm={handleConfirmDeleteUser}
       />
+
       {/* Footer */}
       <footer className="bg-[#1f2937] text-gray-300 py-4 mt-auto">
         <div className="max-w-7xl mx-auto px-4 text-center text-sm text-gray-300">
-          © 2025 PetMatch. Todos los derechos reservados. Desarrollado por el
-          equipo de PetMatch.
+          © 2025 PetMatch. Todos los derechos reservados. Desarrollado por el equipo de PetMatch.
         </div>
       </footer>
     </div>
@@ -292,3 +316,5 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
+
+

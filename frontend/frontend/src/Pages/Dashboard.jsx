@@ -1,7 +1,10 @@
 import { useAuth } from "../App";
 import { useNavigate } from "react-router-dom";
 import { User, LogOut } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import io from "socket.io-client";
+import toast from "react-hot-toast";
+
 import { getAllPets } from "../api/pet";
 import { getMeRequest } from "../api/auth";
 import PetDetailsModal from "../components/Modales/PetDetailsModal";
@@ -20,11 +23,42 @@ const Dashboard = () => {
 
   const [selectedPet, setSelectedPet] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
   const [isAdoptionModalOpen, setIsAdoptionModalOpen] = useState(false);
   const [petToAdopt, setPetToAdopt] = useState(null);
 
   const [userData, setUserData] = useState(null);
+
+  const socket = useRef(null);
+
+  // Conexión a Socket.IO
+  useEffect(() => {
+    if (!user?.id) return;
+
+    socket.current = io("http://localhost:3001");
+
+    socket.current.emit("join",  user.id );
+    
+    socket.current.on("nuevaNotificacion", ({ notification }) => {
+      const { message } = notification;
+
+      toast(`🔔 ${message}`, {
+        duration: 5000,
+        style: {
+          border: "1px solid #e0e0e0",
+          padding: "12px 16px",
+          background: "#fff",
+          color: "#333",
+        },
+        icon: "🔔",
+      });
+
+      console.log("📨 Notificación recibida:", notification);
+});
+
+    return () => {
+      socket.current.disconnect();
+    };
+  }, [user]);
 
   const openModal = (pet) => {
     setSelectedPet(pet);
@@ -136,7 +170,7 @@ const Dashboard = () => {
                 <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
                   <User className="w-4 h-4 text-gray-700" />
                 </div>
-                <span className="ttext-sm font-medium text-white">
+                <span className="text-sm font-medium text-white">
                   {user?.firstName || user?.email}
                 </span>
               </div>

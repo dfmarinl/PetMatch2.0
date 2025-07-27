@@ -1,9 +1,11 @@
 const sequelize = require("../config/database");
+
 const AdoptionFollowUp = require("./adoptionFollowUp");
 const AdoptionRequest = require("./adoptionRequest");
 const CompletedAdoption = require("./completedAdoption");
 const Pet = require("./pet");
 const User = require("./user");
+const Notification = require("./Notification"); // ✅ Nuevo modelo
 
 // =============== RELACIONES ===================
 
@@ -43,6 +45,15 @@ AdoptionFollowUp.belongsTo(CompletedAdoption, {
   foreignKey: { name: "completedAdoptionId", allowNull: false },
 });
 
+// 5. ✅ User ↔ Notification (One-to-Many)
+User.hasMany(Notification, {
+  foreignKey: { name: "userId", allowNull: false },
+  onDelete: "CASCADE",
+});
+Notification.belongsTo(User, {
+  foreignKey: { name: "userId", allowNull: false },
+});
+
 // ==============================================
 
 module.exports = {
@@ -52,4 +63,5 @@ module.exports = {
   CompletedAdoption,
   Pet,
   User,
+  Notification, // ✅ Incluye el modelo en la exportación
 };

@@ -3,10 +3,12 @@ const {
   Pet,
   CompletedAdoption,
   User,
+  Notification,
 } = require("../../../../../models");
 
 const { sendEmail } = require("../../../../utils/emailSender");
 
+// Crear solicitud de adopción
 // Crear solicitud de adopción
 const createAdoptionRequest = async (req, res) => {
   try {
@@ -53,27 +55,45 @@ const createAdoptionRequest = async (req, res) => {
 
     const user = await User.findByPk(userId);
 
-    // Obtener empleados y administradores
+    // Notificación general para admins/empleados
+    const notificationMessage = `${user.firstName} ${user.lastName} ha enviado una nueva solicitud de adopción para ${pet.name}`;
+
+    // Crear notificación en la base de datos para admins
+    await Notification.create({
+     userId: null, // Notificación general
+     rol: "administrador", // O "empleado", dependiendo de a quién va dirigida
+     message: notificationMessage,
+     type: "nuevaSolicitud",
+    });
+
+    // Enviar correos a administradores y empleados
     const adminsAndEmployees = await User.findAll({
       where: {
-        rol: ["empleado", "administrador"], // Importante: roles según tu modelo
+        rol: ["empleado", "administrador"],
       },
     });
 
     const emails = adminsAndEmployees.map((u) => u.email);
-
-    console.log("Correos de empleados y administradores:", emails);
-
-    // Enviar correos en paralelo
     await Promise.all(
       emails.map((email) =>
         sendEmail("newAdoptionRequest", email, {
           userName: `${user.firstName} ${user.lastName}`,
           petName: pet.name,
-          requestLink: "http://localhost:3000/admin/solicitudes", // Reemplaza con tu URL real si es necesario
+          requestLink: "http://localhost:3000/admin/solicitudes",
         })
       )
     );
+
+    // Emitir evento a canal general de admins/empleados
+    const io = req.app.get("io");
+    io.to("admins").emit("new_adoption_request", {
+      message: notificationMessage,
+      type: "nuevaSolicitud",
+      petId: pet.id,
+      userId: user.id,
+      requestId: newRequest.id,
+      createdAt: new Date(),
+    });
 
     res.status(201).json({
       message: "Solicitud enviada correctamente",
@@ -86,9 +106,6 @@ const createAdoptionRequest = async (req, res) => {
       .json({ message: "Error al crear solicitud: " + error.message });
   }
 };
-
-
-
 
 // Aprobar o rechazar una solicitud
 const updateAdoptionRequestStatus = async (req, res) => {
@@ -112,9 +129,13 @@ const updateAdoptionRequestStatus = async (req, res) => {
     request.observations = observations || null;
     await request.save();
 
+    let notificationMessage = "";
+    let notificationType = "";
+    let deliveryDate = null;
+
     if (status === "approved") {
       const daysToAdd = Math.floor(Math.random() * (15 - 3 + 1)) + 3;
-      const deliveryDate = new Date();
+      deliveryDate = new Date();
       deliveryDate.setDate(deliveryDate.getDate() + daysToAdd);
 
       await CompletedAdoption.create({
@@ -134,6 +155,9 @@ const updateAdoptionRequestStatus = async (req, res) => {
         deliveryDate,
       });
 
+      notificationMessage = `¡Tu solicitud de adopción para ${request.Pet.name} fue aprobada! Fecha estimada de entrega: ${deliveryDate.toLocaleDateString()}`;
+      notificationType = "aprobacion";
+
     } else if (status === "rejected") {
       // Enviar correo de rechazo
       await sendEmail("adoptionRejected", request.User.email, {
@@ -141,11 +165,25 @@ const updateAdoptionRequestStatus = async (req, res) => {
         petName: request.Pet.name,
         observations,
       });
+
+      notificationMessage = `Tu solicitud de adopción para ${request.Pet.name} fue rechazada. Observaciones: ${observations || "No especificadas."}`;
+      notificationType = "rechazo";
     }
 
-    res
-      .status(200)
-      .json({ message: "Estado de la solicitud actualizado correctamente." });
+    // Crear notificación para el usuario
+    const notification = await Notification.create({
+      userId: request.userId,
+      rol: "cliente",
+      message: notificationMessage,
+      type: notificationType,
+    });
+    const io = req.app.get("io");
+    // Emitir la notificación al cliente
+    io.to(request.userId.toString()).emit("nuevaNotificacion", {
+  notification,
+});
+
+    res.status(200).json({ message: "Estado de la solicitud actualizado correctamente." });
   } catch (error) {
     console.error("Error al actualizar solicitud:", error);
     res.status(500).json({ message: "Error al actualizar solicitud: " + error.message });
