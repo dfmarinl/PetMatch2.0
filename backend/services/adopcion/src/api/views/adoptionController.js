@@ -60,10 +60,10 @@ const createAdoptionRequest = async (req, res) => {
 
     // Crear notificación en la base de datos para admins
     await Notification.create({
-      userId: null, // No es para un usuario específico
-      role: "admin", // Se envía a los administradores y empleados
-      message: notificationMessage,
-      type: "nuevaSolicitud",
+     userId: null, // Notificación general
+     rol: "administrador", // O "empleado", dependiendo de a quién va dirigida
+     message: notificationMessage,
+     type: "nuevaSolicitud",
     });
 
     // Enviar correos a administradores y empleados
@@ -107,13 +107,6 @@ const createAdoptionRequest = async (req, res) => {
   }
 };
 
-
-
-
-
-
-
-
 // Aprobar o rechazar una solicitud
 const updateAdoptionRequestStatus = async (req, res) => {
   try {
@@ -136,9 +129,13 @@ const updateAdoptionRequestStatus = async (req, res) => {
     request.observations = observations || null;
     await request.save();
 
+    let notificationMessage = "";
+    let notificationType = "";
+    let deliveryDate = null;
+
     if (status === "approved") {
       const daysToAdd = Math.floor(Math.random() * (15 - 3 + 1)) + 3;
-      const deliveryDate = new Date();
+      deliveryDate = new Date();
       deliveryDate.setDate(deliveryDate.getDate() + daysToAdd);
 
       await CompletedAdoption.create({
@@ -158,6 +155,9 @@ const updateAdoptionRequestStatus = async (req, res) => {
         deliveryDate,
       });
 
+      notificationMessage = `¡Tu solicitud de adopción para ${request.Pet.name} fue aprobada! Fecha estimada de entrega: ${deliveryDate.toLocaleDateString()}`;
+      notificationType = "aprobacion";
+
     } else if (status === "rejected") {
       // Enviar correo de rechazo
       await sendEmail("adoptionRejected", request.User.email, {
@@ -165,11 +165,25 @@ const updateAdoptionRequestStatus = async (req, res) => {
         petName: request.Pet.name,
         observations,
       });
+
+      notificationMessage = `Tu solicitud de adopción para ${request.Pet.name} fue rechazada. Observaciones: ${observations || "No especificadas."}`;
+      notificationType = "rechazo";
     }
 
-    res
-      .status(200)
-      .json({ message: "Estado de la solicitud actualizado correctamente." });
+    // Crear notificación para el usuario
+    const notification = await Notification.create({
+      userId: request.userId,
+      rol: "cliente",
+      message: notificationMessage,
+      type: notificationType,
+    });
+    const io = req.app.get("io");
+    // Emitir la notificación al cliente
+    io.to(request.userId.toString()).emit("nuevaNotificacion", {
+  notification,
+});
+
+    res.status(200).json({ message: "Estado de la solicitud actualizado correctamente." });
   } catch (error) {
     console.error("Error al actualizar solicitud:", error);
     res.status(500).json({ message: "Error al actualizar solicitud: " + error.message });

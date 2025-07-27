@@ -93,9 +93,6 @@ const AdminDashboard = () => {
       const response = await getAllRequests();
       setAdoptionRequests(response || []);
 
-      // 🔔 Notificación si hay nuevas solicitudes
-     
-
     } catch (error) {
       setAdoptionError("Error al cargar solicitudes de adopción");
     } finally {
