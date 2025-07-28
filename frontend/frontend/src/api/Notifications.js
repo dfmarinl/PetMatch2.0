@@ -6,7 +6,7 @@ const API_BASE_URL = "http://localhost:3001/api/notificaciones";
 export const getNotificationsByUserId = async (userId) => {
   try {
     const token = localStorage.getItem("token");
-    const response = await axios.get(`${API_BASE_URL}/user/${userId}`, {
+    const response = await axios.get(`${API_BASE_URL}/${userId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -38,8 +38,8 @@ export const createNotification = async (notificationData) => {
 export const markNotificationAsRead = async (notificationId) => {
   try {
     const token = localStorage.getItem("token");
-    const response = await axios.put(
-      `${API_BASE_URL}/${notificationId}/read`,
+    const response = await axios.patch(
+      `${API_BASE_URL}/read/${notificationId}`,
       {},
       {
         headers: {

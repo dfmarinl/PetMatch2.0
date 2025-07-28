@@ -45,7 +45,7 @@ const markAsRead = async (req, res) => {
     const notification = await Notification.findByPk(notificationId);
     if (!notification) return res.status(404).json({ error: "No encontrada" });
 
-    notification.read = true;
+    notification.isRead = true;
     await notification.save();
 
     res.json({ message: "Notificación marcada como leída" });

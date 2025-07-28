@@ -9,6 +9,9 @@ import { getAllPets } from "../api/pet";
 import { getMeRequest } from "../api/auth";
 import PetDetailsModal from "../components/Modales/PetDetailsModal";
 import AdoptionRequestModal from "../components/Modales/AdoptionRequestModal";
+import NotificationBell from "../components/NotificationBell";
+
+
 
 const Dashboard = () => {
   const { user, logout, token } = useAuth();
@@ -149,6 +152,7 @@ const Dashboard = () => {
     <div className="min-h-screen bg-[#f8f9fa]">
       {/* Header */}
       <header className="bg-[#1f2937] shadow-sm">
+         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
@@ -161,7 +165,13 @@ const Dashboard = () => {
                 PetMatch
               </span>
             </div>
+            
+            
+
             <div className="flex items-center space-x-4">
+              <div className="ml-auto">
+                <NotificationBell   />
+             </div>
               <div
                 onClick={() => navigate("/profile")}
                 className="flex items-center space-x-2 cursor-pointer hover:opacity-80 transition-opacity"
