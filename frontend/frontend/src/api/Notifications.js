@@ -38,8 +38,8 @@ export const createNotification = async (notificationData) => {
 export const markNotificationAsRead = async (notificationId) => {
   try {
     const token = localStorage.getItem("token");
-    const response = await axios.put(
-      `${API_BASE_URL}/${notificationId}/read`,
+    const response = await axios.patch(
+      `${API_BASE_URL}/read/${notificationId}`,
       {},
       {
         headers: {
