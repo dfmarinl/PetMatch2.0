@@ -6,6 +6,7 @@ import { getAllUsers, deleteUser, updateUser } from "../api/users";
 import { getAllRequests, updateRequestStatus } from "../api/requests";
 import { useAuth } from "../App";
 
+
 // Components
 import Header from "../components/Header";
 import NavigationTabs from "../components/NavigationTabs";
@@ -200,7 +201,9 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen bg-[#f8f9fa]">
+      
       <Header user={user} onLogout={logout} />
+     
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <NavigationTabs
           activeTab={activeTab}

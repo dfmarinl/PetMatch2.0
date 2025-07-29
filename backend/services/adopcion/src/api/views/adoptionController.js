@@ -66,6 +66,13 @@ const createAdoptionRequest = async (req, res) => {
      type: "nuevaSolicitud",
     });
 
+    await Notification.create({
+     userId: null, // Notificación general
+     rol: "empleado", // O "empleado", dependiendo de a quién va dirigida
+     message: notificationMessage,
+     type: "nuevaSolicitud",
+    });
+
     // Enviar correos a administradores y empleados
     const adminsAndEmployees = await User.findAll({
       where: {

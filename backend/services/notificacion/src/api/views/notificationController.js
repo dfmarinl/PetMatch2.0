@@ -38,6 +38,24 @@ const getNotificationsByUserId = async (req, res) => {
   }
 };
 
+// Obtener notificaciones por rol (administrador o empleado)
+const getNotificationsByRole = async (req, res) => {
+  try {
+    const { role } = req.params;
+
+    const notifications = await Notification.findAll({
+      where: { rol: role }, // Aquí está el cambio: rol en lugar de role
+      order: [["createdAt", "DESC"]],
+    });
+
+    res.json(notifications);
+  } catch (err) {
+    res.status(500).json({ error: "Error al obtener notificaciones por rol", details: err });
+  }
+};
+
+
+
 // Marcar como leída
 const markAsRead = async (req, res) => {
   try {
@@ -57,5 +75,6 @@ const markAsRead = async (req, res) => {
 module.exports = {
   createNotification,
   getNotificationsByUserId,
+  getNotificationsByRole,
   markAsRead,
 };
