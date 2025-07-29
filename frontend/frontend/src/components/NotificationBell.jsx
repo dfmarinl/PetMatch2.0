@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Bell } from "lucide-react";
 import {
   getNotificationsByUserId,
+  getNotificationsByRole, // ✅ importar función por rol
   markNotificationAsRead,
 } from "../api/Notifications";
 import { useAuth } from "../App";
@@ -16,9 +17,20 @@ const NotificationBell = () => {
 
   useEffect(() => {
     const fetchNotifications = async () => {
-      if (user?.id) {
-        const data = await getNotificationsByUserId(user.id);
+      if (!user) return;
+
+      try {
+        let data = [];
+
+        if (user.rol === "cliente") {
+          data = await getNotificationsByUserId(user.id);
+        } else if (user.rol === "administrador" || user.rol === "empleado") {
+          data = await getNotificationsByRole(user.rol);
+        }
+
         setFetchedNotifications(data);
+      } catch (error) {
+        console.error("Error al cargar notificaciones:", error);
       }
     };
 
@@ -85,6 +97,7 @@ const NotificationBell = () => {
 };
 
 export default NotificationBell;
+
 
 
 

@@ -1,6 +1,7 @@
 import React from "react";
 import { User, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import NotificationBell from "./NotificationBell";
 
 const Header = ({ user }) => {
   const navigate = useNavigate();
@@ -28,6 +29,9 @@ const Header = ({ user }) => {
           </div>
 
           <div className="flex items-center space-x-4">
+            <div className="ml-auto">
+                <NotificationBell   />
+             </div>
             <div
               onClick={() =>
                 user?.rol === "administrador" || user?.rol === "empleado"
@@ -37,8 +41,10 @@ const Header = ({ user }) => {
               className="flex items-center space-x-2 cursor-pointer hover:opacity-80 transition-opacity"
               title="Ir a Mi Perfil"
             >
+              
               <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                <User className="w-4 h-4 text-gray-700" />
+               
+               <User className="w-4 h-4 text-gray-700" />
               </div>
               <span className="text-sm font-medium text-white">
                 {user?.firstName}

@@ -53,3 +53,21 @@ export const markNotificationAsRead = async (notificationId) => {
     throw error;
   }
 };
+
+export const getNotificationsByRole = async (role) => {
+  try {
+    const token = localStorage.getItem("token");
+    const response = await axios.get(
+      `http://localhost:3001/api/notificaciones/role/${role}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error al obtener notificaciones por rol:", error);
+    return [];
+  }
+};
