@@ -139,8 +139,10 @@ const AdminDashboard = () => {
       </div>
     ));
     fetchAdoptionRequests();
-  });
 
+  });
+   
+  
   return () => {
     socketRef.current.disconnect();
   };

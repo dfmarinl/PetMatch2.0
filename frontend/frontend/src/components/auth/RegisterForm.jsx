@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Mail, Lock, User, Phone, Eye, EyeOff, MapPin, Home, IdCard } from 'lucide-react';
+import { Mail, Lock, User, Eye, EyeOff, MapPin, Home, IdCard } from 'lucide-react';
 import Input from '../ui/Input';
 import Button from '../ui/Button';
 
@@ -26,7 +26,13 @@ const RegisterForm = ({ onSubmit, loading = false }) => {
     if (!formData.firstName.trim()) newErrors.firstName = 'El nombre es requerido';
     if (!formData.lastName.trim()) newErrors.lastName = 'El apellido es requerido';
     if (!formData.identificationNumber.trim()) newErrors.identificationNumber = 'La identificación es requerida';
-    if (!formData.age || isNaN(formData.age)) newErrors.age = 'La edad es requerida y debe ser un número';
+
+    if (!formData.age || isNaN(formData.age)) {
+      newErrors.age = 'La edad es requerida y debe ser un número';
+    } else if (parseInt(formData.age, 10) < 18) {
+      newErrors.age = 'Debes tener al menos 18 años para registrarte';
+    }
+
     if (!formData.city.trim()) newErrors.city = 'La ciudad es requerida';
     if (!formData.direction.trim()) newErrors.direction = 'La dirección es requerida';
 
@@ -225,3 +231,4 @@ const RegisterForm = ({ onSubmit, loading = false }) => {
 };
 
 export default RegisterForm;
+

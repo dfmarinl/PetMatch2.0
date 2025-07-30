@@ -36,6 +36,13 @@ const UpdateProfileModal = ({ isOpen, onClose, user, onSave }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const age = parseInt(formData.age);
+    if (isNaN(age) || age < 18) {
+      alert("Debes tener al menos 18 años.");
+      return;
+    }
+
     try {
       await onSave(formData); // Ejecuta función que actualiza en backend y recarga datos
       onClose();
@@ -103,7 +110,6 @@ const UpdateProfileModal = ({ isOpen, onClose, user, onSave }) => {
               value={formData.identificationNumber}
               onChange={(e) => {
                 const value = e.target.value;
-                // Solo permitir números (0–9)
                 if (/^\d*$/.test(value)) {
                   setFormData((prev) => ({
                     ...prev,
@@ -188,3 +194,4 @@ const UpdateProfileModal = ({ isOpen, onClose, user, onSave }) => {
 };
 
 export default UpdateProfileModal;
+

@@ -53,6 +53,12 @@ const UserModal = ({ isOpen, onClose, onSubmit, user }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (!formData.age || isNaN(formData.age) || parseInt(formData.age, 10) < 18) {
+      alert("El usuario debe tener al menos 18 años.");
+      return;
+    }
+
     const dataToSend = { ...formData };
     if (isEditMode) {
       delete dataToSend.password;
@@ -228,3 +234,4 @@ const UserModal = ({ isOpen, onClose, onSubmit, user }) => {
 };
 
 export default UserModal;
+
