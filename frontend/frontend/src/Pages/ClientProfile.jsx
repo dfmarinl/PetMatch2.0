@@ -10,6 +10,7 @@ import UpdatePasswordModal from "../components/Modales/UpdatePasswordModal";
 import { User, Settings, Lock, FileText, PawPrint, LogOut } from "lucide-react";
 import { useAuth } from "../App";
 import { useNavigate } from "react-router-dom";
+import NotificationBell from "../components/NotificationBell";
 
 const ClientProfile = () => {
   const [userData, setUserData] = useState(null);
@@ -93,6 +94,9 @@ const ClientProfile = () => {
                 className="flex items-center space-x-2 cursor-pointer hover:opacity-80 transition-opacity"
                 title="Ir a Mi Perfil"
               >
+                <div className="ml-auto">
+                <NotificationBell   />
+             </div>
                 <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
                   <User className="w-4 h-4 text-gray-700" />
                 </div>

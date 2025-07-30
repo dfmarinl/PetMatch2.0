@@ -60,7 +60,7 @@ const emailTemplates = {
   subject: "📢 Nueva solicitud de adopción recibida",
   html: `
     <div style="font-family: Arial, sans-serif; padding: 20px;">
-      <h2>Hola ${userName},</h2>
+      <h2>Hola,</h2>
       <p>Se ha generado una nueva solicitud de adopción para la mascota <strong>${petName}</strong>.</p>
       <p>Por favor, revisa la solicitud lo antes posible.</p>
 
