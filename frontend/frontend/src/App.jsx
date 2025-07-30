@@ -1,4 +1,3 @@
-
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useState, createContext, useContext, useEffect } from "react";
 import { Toaster, toast } from "react-hot-toast";
@@ -15,6 +14,7 @@ import PetsCatalog from "./Pages/PetsCatalog";
 import ClientProfile from "./pages/ClientProfile";
 import StaffProfile from "./pages/StaffProfile";
 import ResetPasswordPage from "./Pages/ResetPasswordPage";
+
 
 // Contexto de autenticación
 const AuthContext = createContext();

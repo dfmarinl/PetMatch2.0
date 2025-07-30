@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Bell } from "lucide-react";
+import { io } from "socket.io-client";
 import {
   getNotificationsByUserId,
-  getNotificationsByRole, // ✅ importar función por rol
+  getNotificationsByRole,
   markNotificationAsRead,
 } from "../api/Notifications";
 import { useAuth } from "../App";
@@ -11,30 +12,54 @@ const NotificationBell = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [fetchedNotifications, setFetchedNotifications] = useState([]);
   const { user } = useAuth();
+  const socketRef = useRef(null);
 
   const allNotifications = [...fetchedNotifications];
   const unreadCount = allNotifications.filter((n) => !n.isRead).length;
 
-  useEffect(() => {
-    const fetchNotifications = async () => {
-      if (!user) return;
+  const fetchNotifications = async () => {
+    if (!user) return;
 
-      try {
-        let data = [];
+    try {
+      let data = [];
 
-        if (user.rol === "cliente") {
-          data = await getNotificationsByUserId(user.id);
-        } else if (user.rol === "administrador" || user.rol === "empleado") {
-          data = await getNotificationsByRole(user.rol);
-        }
-
-        setFetchedNotifications(data);
-      } catch (error) {
-        console.error("Error al cargar notificaciones:", error);
+      if (user.rol === "cliente") {
+        data = await getNotificationsByUserId(user.id);
+      } else if (user.rol === "administrador" || user.rol === "empleado") {
+        data = await getNotificationsByRole(user.rol);
       }
-    };
 
+      setFetchedNotifications(data);
+    } catch (error) {
+      console.error("Error al cargar notificaciones:", error);
+    }
+  };
+
+  useEffect(() => {
     fetchNotifications();
+  }, [user]);
+
+  // Socket.IO para actualizaciones en tiempo real
+  useEffect(() => {
+    if (!user) return;
+
+    socketRef.current = io("http://localhost:3001"); // cambia por la URL de tu backend en producción
+
+    // Unirse a una sala basada en el rol o ID de usuario
+    if (user.rol === "cliente") {
+      socketRef.current.emit("join", `user_${user.id}`);
+    } else {
+      socketRef.current.emit("join", user.rol); // "administrador" o "empleado"
+    }
+
+    // Escuchar el evento personalizado
+    socketRef.current.on("nuevaNotificacion", () => {
+      fetchNotifications();
+    });
+
+    return () => {
+      socketRef.current.disconnect();
+    };
   }, [user]);
 
   const toggleDropdown = () => {
@@ -97,6 +122,7 @@ const NotificationBell = () => {
 };
 
 export default NotificationBell;
+
 
 
 
