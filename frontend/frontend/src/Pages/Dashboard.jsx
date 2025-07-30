@@ -10,6 +10,8 @@ import { getMeRequest } from "../api/auth";
 import PetDetailsModal from "../components/Modales/PetDetailsModal";
 import AdoptionRequestModal from "../components/Modales/AdoptionRequestModal";
 import NotificationBell from "../components/NotificationBell";
+import { Bell } from "lucide-react";
+
 
 
 
@@ -34,34 +36,42 @@ const Dashboard = () => {
   const socket = useRef(null);
 
   // Conexión a Socket.IO
-  useEffect(() => {
-    if (!user?.id) return;
+  
+useEffect(() => {
+  if (!user?.id) return;
 
-    socket.current = io("http://localhost:3001");
+  socket.current = io("http://localhost:3001");
 
-    socket.current.emit("join",  user.id );
-    
-    socket.current.on("nuevaNotificacion", ({ notification }) => {
-      const { message } = notification;
+  socket.current.emit("join", user.id);
 
-      toast(`🔔 ${message}`, {
-        duration: 5000,
-        style: {
-          border: "1px solid #e0e0e0",
-          padding: "12px 16px",
-          background: "#fff",
-          color: "#333",
-        },
-        icon: "🔔",
-      });
+  socket.current.on("nuevaNotificacion", ({ notification }) => {
+    const { message } = notification;
 
-      console.log("📨 Notificación recibida:", notification);
-});
+    toast.custom((t) => (
+      <div
+        className={`max-w-sm w-full bg-white border-l-4 border-blue-500 shadow-lg rounded-lg p-4 flex gap-4 transition-all duration-300 ${
+          t.visible ? "animate-enter" : "animate-leave"
+        }`}
+      >
+        <div className="flex items-start justify-center pt-1">
+          <Bell className="text-blue-600" size={24} />
+        </div>
+        <div className="flex-1">
+          <h4 className="text-sm font-semibold text-gray-800">Notificación</h4>
+          <p className="text-sm text-gray-600 mt-1 leading-snug">
+            {message}
+          </p>
+        </div>
+      </div>
+    ));
 
-    return () => {
-      socket.current.disconnect();
-    };
-  }, [user]);
+    console.log("📨 Notificación recibida:", notification);
+  });
+
+  return () => {
+    socket.current.disconnect();
+  };
+}, [user]);
 
   const openModal = (pet) => {
     setSelectedPet(pet);

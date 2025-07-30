@@ -96,8 +96,8 @@ const createAdoptionRequest = async (req, res) => {
     io.to("admins").emit("new_adoption_request", {
       message: notificationMessage,
       type: "nuevaSolicitud",
-      petId: pet.id,
-      userId: user.id,
+      petName: pet.name,
+      userName: user.firstName,
       requestId: newRequest.id,
       createdAt: new Date(),
     });
