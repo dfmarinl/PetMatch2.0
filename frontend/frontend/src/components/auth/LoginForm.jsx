@@ -3,16 +3,18 @@ import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import Input from '../ui/Input';
 import Button from '../ui/Button';
 import RecoverPasswordForm from './RecoverPasswordForm';
-import { forgotPasswordRequest } from '../../api/auth'; // 👈 importa la función real
+import { forgotPasswordRequest } from '../../api/auth';
 
 const LoginForm = ({ onSubmit, loading = false }) => {
   const [formData, setFormData] = useState({
     email: '',
-    password: ''
+    password: '',
   });
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [recoverMode, setRecoverMode] = useState(false);
+  const [recoverMessage, setRecoverMessage] = useState('');
+  const [recoverError, setRecoverError] = useState('');
 
   const validateForm = () => {
     const newErrors = {};
@@ -42,14 +44,14 @@ const LoginForm = ({ onSubmit, loading = false }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
     if (errors[name]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        [name]: ''
+        [name]: '',
       }));
     }
   };
@@ -59,10 +61,22 @@ const LoginForm = ({ onSubmit, loading = false }) => {
       <div>
         <RecoverPasswordForm
           onSubmit={async ({ email }) => {
-            // 🔗 Integración real con tu API
-            await forgotPasswordRequest(email);
+            try {
+              const response = await forgotPasswordRequest(email);
+              setRecoverMessage(response?.message || 'Mensaje enviado');
+              setRecoverError('');
+            } catch (err) {
+              const msg =
+                err?.response?.data?.message ||
+                err?.message ||
+                'Error al recuperar contraseña';
+              setRecoverError(msg);
+              setRecoverMessage('');
+            }
           }}
           onSuccess={() => setRecoverMode(false)}
+          message={recoverMessage}
+          error={recoverError}
         />
         <div className="text-sm text-center mt-4">
           <button
@@ -123,7 +137,11 @@ const LoginForm = ({ onSubmit, loading = false }) => {
         <button
           type="button"
           className="text-sm text-primary-500 hover:text-primary-600 transition-colors"
-          onClick={() => setRecoverMode(true)}
+          onClick={() => {
+            setRecoverMode(true);
+            setRecoverError('');
+            setRecoverMessage('');
+          }}
         >
           ¿Olvidaste tu contraseña?
         </button>
@@ -141,5 +159,6 @@ const LoginForm = ({ onSubmit, loading = false }) => {
 };
 
 export default LoginForm;
+
 
 
