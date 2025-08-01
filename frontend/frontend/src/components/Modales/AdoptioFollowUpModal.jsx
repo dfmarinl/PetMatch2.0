@@ -12,6 +12,9 @@ const AdoptionFollowUpModal = ({ isOpen, onClose, onSubmit, requestId }) => {
     comments: '',
   });
 
+  const [images, setImages] = useState([]);
+  const [imagePreviews, setImagePreviews] = useState([]);
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
@@ -20,18 +23,35 @@ const AdoptionFollowUpModal = ({ isOpen, onClose, onSubmit, requestId }) => {
     }));
   };
 
+  const handleImageChange = (e) => {
+    const files = Array.from(e.target.files);
+    setImages(files);
+
+    // Generar vista previa
+    const previews = files.map((file) => URL.createObjectURL(file));
+    setImagePreviews(previews);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
+
     const data = {
       ...formData,
-      requestId, // si está relacionado con una solicitud específica
+      requestId,
+      images, // Esto se enviaría como FormData si se suben al servidor
     };
+
     onSubmit(data);
     onClose();
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Seguimiento Post-Adopción">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Seguimiento Post-Adopción"
+      className="backdrop-blur-sm bg-white/90 rounded-xl shadow-lg"
+    >
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-sm font-medium">Fecha de visita</label>
@@ -44,45 +64,22 @@ const AdoptionFollowUpModal = ({ isOpen, onClose, onSubmit, requestId }) => {
           />
         </div>
 
-        <div className="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            name="petIsHealthy"
-            checked={formData.petIsHealthy}
-            onChange={handleChange}
-          />
-          <label>La mascota está saludable</label>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            name="hasProperNutrition"
-            checked={formData.hasProperNutrition}
-            onChange={handleChange}
-          />
-          <label>La mascota tiene una nutrición adecuada</label>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            name="showsAffectionBond"
-            checked={formData.showsAffectionBond}
-            onChange={handleChange}
-          />
-          <label>Hay un vínculo afectivo adoptante-mascota</label>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            name="otherPetsAreFriendly"
-            checked={formData.otherPetsAreFriendly}
-            onChange={handleChange}
-          />
-          <label>Otras mascotas conviven amigablemente</label>
-        </div>
+        {[
+          { name: 'petIsHealthy', label: 'La mascota está saludable' },
+          { name: 'hasProperNutrition', label: 'La mascota tiene una nutrición adecuada' },
+          { name: 'showsAffectionBond', label: 'Hay un vínculo afectivo adoptante-mascota' },
+          { name: 'otherPetsAreFriendly', label: 'Otras mascotas conviven amigablemente' },
+        ].map((item) => (
+          <div key={item.name} className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              name={item.name}
+              checked={formData[item.name]}
+              onChange={handleChange}
+            />
+            <label>{item.label}</label>
+          </div>
+        ))}
 
         <div>
           <label className="block text-sm font-medium">Comentarios adicionales</label>
@@ -94,15 +91,45 @@ const AdoptionFollowUpModal = ({ isOpen, onClose, onSubmit, requestId }) => {
           />
         </div>
 
-        <div className="flex justify-end space-x-2">
+        <div>
+          <label className="block text-sm font-medium">Fotos de la visita</label>
+          <input
+            type="file"
+            multiple
+            accept="image/*"
+            onChange={handleImageChange}
+            className="w-full mt-1"
+          />
+
+          {imagePreviews.length > 0 && (
+            <div className="flex gap-2 mt-3 flex-wrap">
+              {imagePreviews.map((src, idx) => (
+                <img
+                  key={idx}
+                  src={src}
+                  alt={`preview-${idx}`}
+                  className="w-24 h-24 object-cover rounded border"
+                />
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="flex justify-end space-x-2 pt-2">
           <Button type="button" onClick={onClose} variant="secondary">
             Cancelar
           </Button>
-          <Button type="submit">Guardar Seguimiento</Button>
-        </div>
+          <Button
+            type="submit"
+            className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-4 py-2 rounded-md"
+          >
+            Guardar Seguimiento
+          </Button>        
+          </div>
       </form>
     </Modal>
   );
 };
 
 export default AdoptionFollowUpModal;
+

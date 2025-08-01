@@ -65,6 +65,15 @@ const RequestsTab = ({ requests, loading, error, onUpdateStatus }) => {
             </div>
 
             <p><strong>Mascota:</strong> {req.Pet?.name || 'Desconocida'}</p>
+            {req.Pet?.image && (
+            <div className="my-2">
+              <img
+                src={req.Pet.image}
+                alt={`Imagen de ${req.Pet.name}`}
+                className="w-32 h-32 object-cover rounded border"
+              />
+            </div>
+            )}
             <p><strong>Motivo:</strong> {req.reasonForAdoption}</p>
             <p><strong>¿Ha tenido mascotas?:</strong> {req.hadPetsBefore ? 'Sí' : 'No'}</p>
             <p><strong>Tiempo diario disponible:</strong> {req.dailyTimeForPet} horas</p>
@@ -103,6 +112,13 @@ const RequestsTab = ({ requests, loading, error, onUpdateStatus }) => {
                   className="flex items-center gap-1 px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
                 >
                   <XCircle size={16} /> Rechazar
+                </button>
+
+                 <button
+                  onClick={() => openModal(req.id, 'suspended')}
+                  className="flex items-center gap-1 px-3 py-1 bg-purple-600 text-white rounded hover:bg-purple-700"
+                >
+                  Suspender
                 </button>
               </div>
             )}

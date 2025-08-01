@@ -3,9 +3,11 @@ import toast from "react-hot-toast";
 import { io } from "socket.io-client";
 import { getAllPets } from "../api/pet";
 import { getAllUsers, deleteUser, updateUser } from "../api/users";
-import { getAllRequests, updateRequestStatus } from "../api/requests";
+import { getAllRequests, updateRequestStatus , getCompletedAdoptions } from "../api/requests";
 import { useAuth } from "../App";
 import { PawPrint } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+
 
 
 
@@ -17,6 +19,8 @@ import PetsTab from "../components/PetsTab";
 import RequestsTab from "../components/RequestsTab";
 import UsersTab from "../components/UsersTab";
 import AdoptionsTab from "../components/AdoptionsTab";
+import FollowUpModal from "../components/Modales/FollowUpModal";
+
 
 
 
@@ -31,11 +35,15 @@ import DeleteUserConfirmModal from "../components/Modales/DeleteUserConfirmModal
 const AdminDashboard = () => {
   const { user, logout } = useAuth();
   const [activeTab, setActiveTab] = useState("overview");
+  const navigate = useNavigate();
+  
 
   // Pets
   const [apiPets, setApiPets] = useState([]);
   const [apiLoading, setApiLoading] = useState(false);
   const [apiError, setApiError] = useState(null);
+  //adoptions
+  const [completedAdoptions, setCompletedAdoptions] = useState([]);
 
   // Users
   const [apiUsers, setApiUsers] = useState([]);
@@ -67,6 +75,11 @@ const AdminDashboard = () => {
   const [filterType, setFilterType] = useState("all");
   const [showFilters, setShowFilters] = useState(false);
 
+  const [showFollowUpModal, setShowFollowUpModal] = useState(false);
+  const [followUpPet, setFollowUpPet] = useState(null);
+  const [followUpsData, setFollowUpsData] = useState([]); // Aquí irá luego la data real desde la API
+
+
   const fetchApiPets = async () => {
     setApiLoading(true);
     try {
@@ -80,6 +93,17 @@ const AdminDashboard = () => {
     }
   };
 
+  const fetchCompletedAdoptions = async () => {
+  try {
+    const response = await getCompletedAdoptions();
+    setCompletedAdoptions(response || []);
+    console.log(response);
+  } catch (error) {
+    console.error("Error al cargar adopciones completadas:", error);
+  }
+};
+
+
   const fetchApiUsers = async () => {
     setApiUsersLoading(true);
     try {
@@ -92,6 +116,44 @@ const AdminDashboard = () => {
       setApiUsersLoading(false);
     }
   };
+
+  const handleFollowUp = (pet) => {
+  setFollowUpPet(pet);
+
+  // Datos simulados por ahora
+  const mockFollowUps = [
+  {
+    id: 1,
+    visitDate: "2025-07-01",
+    petIsHealthy: true,
+    hasProperNutrition: true,
+    showsAffectionBond: true,
+    otherPetsAreFriendly: true,
+    comments: "La mascota está en excelente estado.",
+    images: [
+      "https://placekitten.com/300/200",
+      "https://images.unsplash.com/photo-1558788353-f76d92427f16?auto=format&fit=crop&w=300&q=80"
+    ],
+  },
+  {
+    id: 2,
+    visitDate: "2025-07-15",
+    petIsHealthy: true,
+    hasProperNutrition: false,
+    showsAffectionBond: true,
+    otherPetsAreFriendly: false,
+    comments: "Se recomienda mejorar la alimentación.",
+    images: [
+      "https://placedog.net/300/200",
+      "https://images.unsplash.com/photo-1601758123927-196d5f3c7607?auto=format&fit=crop&w=300&q=80"
+    ],
+  }
+];
+
+  setFollowUpsData(mockFollowUps);
+  setShowFollowUpModal(true);
+};
+
 
   const fetchAdoptionRequests = async () => {
     setAdoptionLoading(true);
@@ -143,6 +205,10 @@ const AdminDashboard = () => {
     ));
     fetchAdoptionRequests();
 
+     setTimeout(() => {
+        navigate(0);
+      }, 3000); // Espera 3 segundos antes de navegar
+
   });
    
   
@@ -157,6 +223,8 @@ const AdminDashboard = () => {
     if (activeTab === "pets") fetchApiPets();
     if (activeTab === "users" && user?.rol !== "empleado") fetchApiUsers();
     if (activeTab === "requests") fetchAdoptionRequests();
+    if (activeTab === "adoptions") fetchCompletedAdoptions();
+
   }, [activeTab, user]);
 
   const handleCreatePet = () => {
@@ -258,8 +326,9 @@ const AdminDashboard = () => {
           />
         )}
         {activeTab === "adoptions" && (
-          <AdoptionsTab pets={apiPets} />
+          <AdoptionsTab adoptions={completedAdoptions} onFollowUp={handleFollowUp} />
         )}
+
 
 
         {activeTab === "requests" && (
@@ -329,6 +398,14 @@ const AdminDashboard = () => {
         userName={`${selectedUser?.firstName} ${selectedUser?.lastName}`}
         onConfirm={handleConfirmDeleteUser}
       />
+
+      <FollowUpModal
+        isOpen={showFollowUpModal}
+        onClose={() => setShowFollowUpModal(false)}
+        pet={followUpPet}
+        followUps={followUpsData}
+      />
+
 
       {/* Footer */}
       <footer className="bg-[#1f2937] text-gray-300 py-4 mt-auto">
