@@ -16,6 +16,9 @@ import OverviewTab from "../components/OverviewTab";
 import PetsTab from "../components/PetsTab";
 import RequestsTab from "../components/RequestsTab";
 import UsersTab from "../components/UsersTab";
+import AdoptionsTab from "../components/AdoptionsTab";
+
+
 
 // Modals
 import PetModal from "../components/Modales/PetModal";
@@ -254,6 +257,10 @@ const AdminDashboard = () => {
             setShowFilters={setShowFilters}
           />
         )}
+        {activeTab === "adoptions" && (
+          <AdoptionsTab pets={apiPets} />
+        )}
+
 
         {activeTab === "requests" && (
           <RequestsTab
