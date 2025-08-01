@@ -202,7 +202,7 @@ const getAllRequests = async (req, res) => {
   try {
     const requests = await AdoptionRequest.findAll({
       include: [
-        { model: Pet, attributes: ["name"] },
+        { model: Pet, attributes: ["name","image"] },
         { model: CompletedAdoption, attributes: ["approvalDate", "deliveryDate"] },
       ],
       order: [["id", "DESC"]],

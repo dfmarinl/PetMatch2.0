@@ -41,3 +41,19 @@ export const createAdoptionRequest = async (requestData) => {
     throw error;
   }
 };
+
+export const getCompletedAdoptions = async () => {
+  const token = localStorage.getItem('token');
+
+  try {
+    const res = await axios.get('http://localhost:3001/api/adoption/completedAdoptions', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return res.data;
+  } catch (error) {
+    console.error('Error al obtener adopciones completadas:', error);
+    throw error;
+  }
+};

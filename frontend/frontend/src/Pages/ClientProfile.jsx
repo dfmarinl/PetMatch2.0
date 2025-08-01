@@ -2,12 +2,18 @@ import { useEffect, useState } from "react";
 import {
   getMeRequest,
   updateProfileRequest,
-  verifyCurrentPasswordRequest,
-  updatePasswordRequest,
 } from "../api/auth";
 import UpdateProfileModal from "../components/Modales/UpdateProfileModal";
 import UpdatePasswordModal from "../components/Modales/UpdatePasswordModal";
-import { User, Settings, Lock, FileText, PawPrint, LogOut } from "lucide-react";
+import AdoptionFollowUpModal from "../components/Modales/AdoptioFollowUpModal"
+import {
+  User,
+  Settings,
+  Lock,
+  FileText,
+  PawPrint,
+  LogOut,
+} from "lucide-react";
 import { useAuth } from "../App";
 import { useNavigate } from "react-router-dom";
 import NotificationBell from "../components/NotificationBell";
@@ -19,6 +25,8 @@ const ClientProfile = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [isFollowUpModalOpen, setIsFollowUpModalOpen] = useState(false);
+  const [selectedPet, setSelectedPet] = useState(null);
 
   const { logout } = useAuth();
   const navigate = useNavigate();
@@ -54,6 +62,11 @@ const ClientProfile = () => {
     }
   };
 
+  const handleOpenFollowUpModal = (pet) => {
+    setSelectedPet(pet);
+    setIsFollowUpModalOpen(true);
+  };
+
   if (loading)
     return <div className="text-center py-10">Cargando información...</div>;
   if (error)
@@ -72,6 +85,12 @@ const ClientProfile = () => {
       <UpdatePasswordModal
         isOpen={isPasswordModalOpen}
         onClose={() => setIsPasswordModalOpen(false)}
+      />
+
+      <AdoptionFollowUpModal
+        isOpen={isFollowUpModalOpen}
+        onClose={() => setIsFollowUpModalOpen(false)}
+        pet={selectedPet}
       />
 
       {/* Header */}
@@ -95,8 +114,8 @@ const ClientProfile = () => {
                 title="Ir a Mi Perfil"
               >
                 <div className="ml-auto">
-                <NotificationBell   />
-             </div>
+                  <NotificationBell />
+                </div>
                 <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
                   <User className="w-4 h-4 text-gray-700" />
                 </div>
@@ -140,35 +159,16 @@ const ClientProfile = () => {
               Información Personal
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700 text-center">
-              <p>
-                <strong>ID:</strong> {userData.id}
-              </p>
-              <p>
-                <strong>Nombre:</strong> {userData.firstName}{" "}
-                {userData.lastName}
-              </p>
-              <p>
-                <strong>Número de Identificación:</strong>{" "}
-                {userData.identificationNumber}
-              </p>
-              <p>
-                <strong>Edad:</strong> {userData.age}
-              </p>
-              <p>
-                <strong>Email:</strong> {userData.email}
-              </p>
-              <p>
-                <strong>Ciudad:</strong> {userData.city}
-              </p>
-              <p>
-                <strong>Dirección:</strong> {userData.direction}
-              </p>
-              <p>
-                <strong>Rol:</strong> {userData.rol}
-              </p>
+              <p><strong>ID:</strong> {userData.id}</p>
+              <p><strong>Nombre:</strong> {userData.firstName} {userData.lastName}</p>
+              <p><strong>Número de Identificación:</strong> {userData.identificationNumber}</p>
+              <p><strong>Edad:</strong> {userData.age}</p>
+              <p><strong>Email:</strong> {userData.email}</p>
+              <p><strong>Ciudad:</strong> {userData.city}</p>
+              <p><strong>Dirección:</strong> {userData.direction}</p>
+              <p><strong>Rol:</strong> {userData.rol}</p>
               <p className="md:col-span-2">
-                <strong>Registrado:</strong>{" "}
-                {new Date(userData.createdAt).toLocaleDateString()}
+                <strong>Registrado:</strong> {new Date(userData.createdAt).toLocaleDateString()}
               </p>
             </div>
           </div>
@@ -249,6 +249,7 @@ const ClientProfile = () => {
                     <th className="px-4 py-2">Raza</th>
                     <th className="px-4 py-2">Edad</th>
                     <th className="px-4 py-2">Género</th>
+                    <th className="px-4 py-2">Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -261,6 +262,14 @@ const ClientProfile = () => {
                       <td className="px-4 py-2">{pet.age}</td>
                       <td className="px-4 py-2">
                         {pet.gender === "female" ? "Hembra" : "Macho"}
+                      </td>
+                      <td className="px-4 py-2">
+                        <button
+                          onClick={() => handleOpenFollowUpModal(pet)}
+                          className="text-sm text-blue-600 hover:underline"
+                        >
+                          Registrar seguimiento
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -283,3 +292,4 @@ const ClientProfile = () => {
 };
 
 export default ClientProfile;
+
