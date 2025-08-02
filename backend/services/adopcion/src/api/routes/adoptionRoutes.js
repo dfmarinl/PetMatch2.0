@@ -78,7 +78,7 @@ router.get(
 router.get(
   "/completedAdoptions/user/:userId",
   verifyToken,
-  authorizeRoles("empleado", "administrador"),
+  authorizeRoles("empleado", "administrador","cliente"),
   getCompletedAdoptionsByUserId
 );
 module.exports = router;

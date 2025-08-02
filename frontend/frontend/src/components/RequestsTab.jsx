@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { CheckCircle, XCircle } from 'lucide-react';
+import { CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
 import { getUserById } from '../api/users';
 import StatusUpdateModal from './Modales/StatusUpdateModal';
 
@@ -65,15 +65,24 @@ const RequestsTab = ({ requests, loading, error, onUpdateStatus }) => {
             </div>
 
             <p><strong>Mascota:</strong> {req.Pet?.name || 'Desconocida'}</p>
+
             {req.Pet?.image && (
-            <div className="my-2">
-              <img
-                src={req.Pet.image}
-                alt={`Imagen de ${req.Pet.name}`}
-                className="w-32 h-32 object-cover rounded border"
-              />
-            </div>
+              <div className="my-2">
+                <img
+                  src={req.Pet.image}
+                  alt={`Imagen de ${req.Pet.name}`}
+                  className="w-32 h-32 object-cover rounded border"
+                />
+              </div>
             )}
+
+            {/* Aviso si la mascota ya fue adoptada */}
+            {req.Pet?.available === false && (
+              <div className="flex items-center gap-2 text-red-700 bg-red-100 px-3 py-2 rounded mb-2 text-sm font-medium">
+                <AlertTriangle size={18} /> Mascota ya adoptada
+              </div>
+            )}
+
             <p><strong>Motivo:</strong> {req.reasonForAdoption}</p>
             <p><strong>¿Ha tenido mascotas?:</strong> {req.hadPetsBefore ? 'Sí' : 'No'}</p>
             <p><strong>Tiempo diario disponible:</strong> {req.dailyTimeForPet} horas</p>
@@ -101,12 +110,23 @@ const RequestsTab = ({ requests, loading, error, onUpdateStatus }) => {
 
             {req.adoptionStatus === 'pending' && (
               <div className="flex gap-2 mt-4">
-                <button
-                  onClick={() => openModal(req.id, 'approved')}
-                  className="flex items-center gap-1 px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
-                >
-                  <CheckCircle size={16} /> Aprobar
-                </button>
+                {req.Pet?.available ? (
+                  <button
+                    onClick={() => openModal(req.id, 'approved')}
+                    className="flex items-center gap-1 px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
+                  >
+                    <CheckCircle size={16} /> Aprobar
+                  </button>
+                ) : (
+                  <button
+                    disabled
+                    className="flex items-center gap-1 px-3 py-1 bg-gray-400 text-white rounded cursor-not-allowed"
+                    title="La mascota ya no está disponible para adopción"
+                  >
+                    <CheckCircle size={16} /> Aprobar
+                  </button>
+                )}
+
                 <button
                   onClick={() => openModal(req.id, 'rejected')}
                   className="flex items-center gap-1 px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
@@ -114,7 +134,7 @@ const RequestsTab = ({ requests, loading, error, onUpdateStatus }) => {
                   <XCircle size={16} /> Rechazar
                 </button>
 
-                 <button
+                <button
                   onClick={() => openModal(req.id, 'suspended')}
                   className="flex items-center gap-1 px-3 py-1 bg-purple-600 text-white rounded hover:bg-purple-700"
                 >
@@ -138,6 +158,8 @@ const RequestsTab = ({ requests, loading, error, onUpdateStatus }) => {
 };
 
 export default RequestsTab;
+
+
 
 
 
