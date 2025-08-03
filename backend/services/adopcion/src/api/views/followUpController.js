@@ -14,6 +14,7 @@ const createFollowUp = async (req, res) => {
       showsAffectionBond,
       otherPetsAreFriendly,
       comments,
+      image,
     } = req.body;
 
     if (!completedAdoptionId) {
@@ -22,7 +23,6 @@ const createFollowUp = async (req, res) => {
         .json({ message: "Falta el ID de adopción completada." });
     }
 
-    // Validación mínima de campos booleanos obligatorios
     if (
       petIsHealthy === undefined ||
       hasProperNutrition === undefined ||
@@ -49,6 +49,7 @@ const createFollowUp = async (req, res) => {
       showsAffectionBond,
       otherPetsAreFriendly,
       comments,
+      image,
     });
 
     res.status(201).json({
@@ -74,6 +75,7 @@ const updateFollowUp = async (req, res) => {
       showsAffectionBond,
       otherPetsAreFriendly,
       comments,
+      image,
     } = req.body;
 
     const followUp = await AdoptionFollowUp.findByPk(id);
@@ -88,6 +90,7 @@ const updateFollowUp = async (req, res) => {
       showsAffectionBond,
       otherPetsAreFriendly,
       comments,
+      image,
     });
 
     res.status(200).json({

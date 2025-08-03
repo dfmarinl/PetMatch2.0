@@ -111,7 +111,7 @@ const getMe = async (req, res) => {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
 
-    // Obtener solicitudes del usuario
+    // Obtener todas las solicitudes del usuario
     const adoptionRequests = await AdoptionRequest.findAll({
       where: { userId },
       include: [
@@ -123,42 +123,46 @@ const getMe = async (req, res) => {
       order: [["id", "DESC"]],
     });
 
-    // Paso 1: Buscar las solicitudes aprobadas del usuario (solo IDs)
-    const approvedRequests = await AdoptionRequest.findAll({
-      where: {
-        userId: userId,
-        adoptionStatus: "approved",
-      },
-      attributes: ["id", "petId"], // Solo necesitamos estos campos
+    // Obtener mascotas adoptadas junto con las solicitudes y adopciones completadas
+    const completedAdoptions = await CompletedAdoption.findAll({
+      include: [
+        {
+          model: AdoptionRequest,
+          where: {
+            userId: userId,
+            adoptionStatus: "approved",
+          },
+          include: [
+            {
+              model: Pet,
+              attributes: [
+                "id",
+                "name",
+                "species",
+                "breed",
+                "image",
+                "age",
+                "gender",
+              ],
+            },
+          ],
+        },
+      ],
     });
 
-    // Paso 2: Extraer los IDs de las mascotas de las solicitudes aprobadas
-    const adoptedPetIds = approvedRequests.map((request) => request.petId);
-
-    // Paso 3: Obtener la información de las mascotas adoptadas
-    let adoptedPets = [];
-
-    if (adoptedPetIds.length > 0) {
-      adoptedPets = await Pet.findAll({
-        where: {
-          id: adoptedPetIds,
-        },
-        attributes: [
-          "id",
-          "name",
-          "species",
-          "breed",
-          "image",
-          "age",
-          "gender",
-        ],
-      });
-    }
+    const adoptedPets = completedAdoptions.map((ca) => {
+      const pet = ca.AdoptionRequest.Pet;
+      return {
+        completedAdoptionId: ca.id,
+        adoptionRequestId: ca.AdoptionRequest.id,
+        ...pet.toJSON(),
+      };
+    });
 
     res.status(200).json({
       ...usuario.toJSON(),
       AdoptionRequests: adoptionRequests,
-      AdoptedPets: adoptedPets, // Solo las mascotas adoptadas
+      AdoptedPets: adoptedPets, // Incluye ID de solicitud y adopción
     });
   } catch (error) {
     console.error("Error en getMe:", error);
@@ -329,11 +333,11 @@ const forgotPassword = async (req, res) => {
     });
 
     // Enviar correo
-   await transporter.sendMail({
-  from: `"PetMatch" <${process.env.EMAIL_USER}>`,
-  to: email,
-  subject: "Recuperación de contraseña - PetMatch",
-  html: `
+    await transporter.sendMail({
+      from: `"PetMatch" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: "Recuperación de contraseña - PetMatch",
+      html: `
     <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px;">
       <img src="https://res.cloudinary.com/djcnay2fx/image/upload/v1753202572/logo_fpycut.jpg" alt="Logo" width="100" />
       <h1>¡Hola de nuevo, ${user.firstName}!</h1>
@@ -346,7 +350,7 @@ const forgotPassword = async (req, res) => {
       <p>Ignora este correo si no pediste restablecer tu contraseña.</p>
     </div>
   `,
-});
+    });
     res
       .status(200)
       .json({ message: "Correo enviado para restablecer la contraseña" });

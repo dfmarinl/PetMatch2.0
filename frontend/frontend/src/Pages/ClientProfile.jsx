@@ -1,19 +1,11 @@
 import { useEffect, useState } from "react";
-import {
-  getMeRequest,
-  updateProfileRequest,
-} from "../api/auth";
+import { getMeRequest, updateProfileRequest } from "../api/auth";
+import { createFollowUp } from "../api/followUp";
+import { uploadPetImage } from "../api/petImage";
 import UpdateProfileModal from "../components/Modales/UpdateProfileModal";
 import UpdatePasswordModal from "../components/Modales/UpdatePasswordModal";
-import AdoptionFollowUpModal from "../components/Modales/AdoptioFollowUpModal"
-import {
-  User,
-  Settings,
-  Lock,
-  FileText,
-  PawPrint,
-  LogOut,
-} from "lucide-react";
+import AdoptionFollowUpModal from "../components/Modales/AdoptioFollowUpModal";
+import { User, Settings, Lock, FileText, PawPrint, LogOut } from "lucide-react";
 import { useAuth } from "../App";
 import { useNavigate } from "react-router-dom";
 import NotificationBell from "../components/NotificationBell";
@@ -67,6 +59,29 @@ const ClientProfile = () => {
     setIsFollowUpModalOpen(true);
   };
 
+  const handleFollowUpSubmit = async (formData) => {
+    try {
+      let imageUrl = "";
+
+      if (formData.images && formData.images.length > 0) {
+        imageUrl = await uploadPetImage(formData.images[0]);
+      }
+
+      const followUpPayload = {
+        ...formData,
+        image: imageUrl,
+      };
+
+      await createFollowUp(followUpPayload);
+      alert("Seguimiento registrado exitosamente.");
+      setIsFollowUpModalOpen(false);
+      setSelectedPet(null);
+    } catch (error) {
+      console.error("Error al registrar seguimiento:", error);
+      alert("Hubo un error al registrar el seguimiento.");
+    }
+  };
+
   if (loading)
     return <div className="text-center py-10">Cargando información...</div>;
   if (error)
@@ -89,8 +104,12 @@ const ClientProfile = () => {
 
       <AdoptionFollowUpModal
         isOpen={isFollowUpModalOpen}
-        onClose={() => setIsFollowUpModalOpen(false)}
+        onClose={() => {
+          setIsFollowUpModalOpen(false);
+          setSelectedPet(null);
+        }}
         pet={selectedPet}
+        onSubmit={handleFollowUpSubmit}
       />
 
       {/* Header */}
@@ -159,16 +178,35 @@ const ClientProfile = () => {
               Información Personal
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700 text-center">
-              <p><strong>ID:</strong> {userData.id}</p>
-              <p><strong>Nombre:</strong> {userData.firstName} {userData.lastName}</p>
-              <p><strong>Número de Identificación:</strong> {userData.identificationNumber}</p>
-              <p><strong>Edad:</strong> {userData.age}</p>
-              <p><strong>Email:</strong> {userData.email}</p>
-              <p><strong>Ciudad:</strong> {userData.city}</p>
-              <p><strong>Dirección:</strong> {userData.direction}</p>
-              <p><strong>Rol:</strong> {userData.rol}</p>
+              <p>
+                <strong>ID:</strong> {userData.id}
+              </p>
+              <p>
+                <strong>Nombre:</strong> {userData.firstName}{" "}
+                {userData.lastName}
+              </p>
+              <p>
+                <strong>Número de Identificación:</strong>{" "}
+                {userData.identificationNumber}
+              </p>
+              <p>
+                <strong>Edad:</strong> {userData.age}
+              </p>
+              <p>
+                <strong>Email:</strong> {userData.email}
+              </p>
+              <p>
+                <strong>Ciudad:</strong> {userData.city}
+              </p>
+              <p>
+                <strong>Dirección:</strong> {userData.direction}
+              </p>
+              <p>
+                <strong>Rol:</strong> {userData.rol}
+              </p>
               <p className="md:col-span-2">
-                <strong>Registrado:</strong> {new Date(userData.createdAt).toLocaleDateString()}
+                <strong>Registrado:</strong>{" "}
+                {new Date(userData.createdAt).toLocaleDateString()}
               </p>
             </div>
           </div>
@@ -213,19 +251,31 @@ const ClientProfile = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {userData.AdoptionRequests.map((req) => (
-                    <tr key={req.id} className="border-t">
-                      <td className="px-4 py-2">{req.id}</td>
-                      <td className="px-4 py-2">{req.Pet.name}</td>
-                      <td className="px-4 py-2">{req.adoptionStatus}</td>
-                      <td className="px-4 py-2 truncate max-w-xs">
-                        {req.reasonForAdoption}
-                      </td>
-                      <td className="px-4 py-2">
-                        {new Date(req.createdAt).toLocaleDateString()}
+                  {userData.AdoptionRequests &&
+                  userData.AdoptionRequests.length > 0 ? (
+                    userData.AdoptionRequests.map((req) => (
+                      <tr key={req.id} className="border-t">
+                        <td className="px-4 py-2">{req.id}</td>
+                        <td className="px-4 py-2">{req.Pet.name}</td>
+                        <td className="px-4 py-2">{req.adoptionStatus}</td>
+                        <td className="px-4 py-2 truncate max-w-xs">
+                          {req.reasonForAdoption}
+                        </td>
+                        <td className="px-4 py-2">
+                          {new Date(req.createdAt).toLocaleDateString()}
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan="5"
+                        className="px-4 py-8 text-center text-gray-500"
+                      >
+                        No tienes solicitudes de adopción registradas
                       </td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
             </div>
@@ -253,26 +303,37 @@ const ClientProfile = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {userData.AdoptedPets.map((pet) => (
-                    <tr key={pet.id} className="border-t">
-                      <td className="px-4 py-2">{pet.id}</td>
-                      <td className="px-4 py-2">{pet.name}</td>
-                      <td className="px-4 py-2">{pet.species}</td>
-                      <td className="px-4 py-2">{pet.breed}</td>
-                      <td className="px-4 py-2">{pet.age}</td>
-                      <td className="px-4 py-2">
-                        {pet.gender === "female" ? "Hembra" : "Macho"}
-                      </td>
-                      <td className="px-4 py-2">
-                        <button
-                          onClick={() => handleOpenFollowUpModal(pet)}
-                          className="text-sm text-blue-600 hover:underline"
-                        >
-                          Registrar seguimiento
-                        </button>
+                  {userData.AdoptedPets && userData.AdoptedPets.length > 0 ? (
+                    userData.AdoptedPets.map((pet) => (
+                      <tr key={pet.id} className="border-t">
+                        <td className="px-4 py-2">{pet.id}</td>
+                        <td className="px-4 py-2">{pet.name}</td>
+                        <td className="px-4 py-2">{pet.species}</td>
+                        <td className="px-4 py-2">{pet.breed}</td>
+                        <td className="px-4 py-2">{pet.age}</td>
+                        <td className="px-4 py-2">
+                          {pet.gender === "female" ? "Hembra" : "Macho"}
+                        </td>
+                        <td className="px-4 py-2">
+                          <button
+                            onClick={() => handleOpenFollowUpModal(pet)}
+                            className="text-sm text-blue-600 hover:underline"
+                          >
+                            Registrar seguimiento
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan="7"
+                        className="px-4 py-8 text-center text-gray-500"
+                      >
+                        No tienes mascotas adoptadas registradas
                       </td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
             </div>
@@ -292,4 +353,3 @@ const ClientProfile = () => {
 };
 
 export default ClientProfile;
-
