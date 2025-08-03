@@ -16,28 +16,28 @@ const {
 router.post(
   "/followups",
   verifyToken,
-  authorizeRoles("empleado", "administrador"),
+  authorizeRoles("cliente"),
   createFollowUp
 );
 
 router.put(
   "/followups/:id",
   verifyToken,
-  authorizeRoles("empleado", "administrador"),
+  authorizeRoles("empleado", "administrador", "cliente"),
   updateFollowUp
 );
 
 router.delete(
   "/followups/:id",
   verifyToken,
-  authorizeRoles("empleado", "administrador"),
+  authorizeRoles("empleado", "administrador", "cliente"),
   deleteFollowUp
 );
 
 router.get(
   "/followups/byAdoption/:completedAdoptionId",
   verifyToken,
-  authorizeRoles("empleado", "administrador"),
+  authorizeRoles("empleado", "administrador", "cliente"),
   getFollowUpsByAdoption
 );
 

@@ -37,6 +37,11 @@ const AdoptionFollowUp = sequelize.define("AdoptionFollowUp", {
     allowNull: true,
     comment: "Observaciones adicionales del seguimiento.",
   },
+  image: {
+    type: DataTypes.TEXT("long"), // Para cadenas Base64 largas
+    allowNull: true,
+    comment: "Base64-encoded image string",
+  },
 });
 
 module.exports = AdoptionFollowUp;
