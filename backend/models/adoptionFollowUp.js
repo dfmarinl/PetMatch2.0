@@ -31,6 +31,11 @@ const AdoptionFollowUp = sequelize.define("AdoptionFollowUp", {
     allowNull: true,
     comment: "Otras mascotas conviven de forma pacífica (si aplica).",
   },
+  isSuccessful: {
+    type: DataTypes.BOOLEAN,
+    allowNull: true,
+    comment: "Indica si el seguimiento post-adopción fue satisfactorio.",
+  },
 
   comments: {
     type: DataTypes.TEXT,

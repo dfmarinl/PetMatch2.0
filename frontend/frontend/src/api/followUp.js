@@ -29,3 +29,23 @@ export const createFollowUp = async (followUpData) => {
     throw error;
   }
 };
+
+export const getFollowUpsByPetIdRequest = async (petId) => {
+  try {
+    const token = localStorage.getItem("token");
+
+    const response = await axios.get(
+      `${API_BASE_URL}/followups/byPet/${petId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Error al obtener seguimientos por mascota:", error);
+    throw error;
+  }
+};

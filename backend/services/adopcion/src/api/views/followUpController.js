@@ -1,6 +1,8 @@
 const {
   AdoptionFollowUp,
   CompletedAdoption,
+  AdoptionRequest,
+  Pet,
 } = require("../../../../../models");
 
 //Crear un reporte de seguimiento
@@ -15,6 +17,7 @@ const createFollowUp = async (req, res) => {
       otherPetsAreFriendly,
       comments,
       image,
+      isSuccessful, // ✅ nuevo campo
     } = req.body;
 
     if (!completedAdoptionId) {
@@ -50,6 +53,7 @@ const createFollowUp = async (req, res) => {
       otherPetsAreFriendly,
       comments,
       image,
+      isSuccessful, // ✅ incluir
     });
 
     res.status(201).json({
@@ -76,6 +80,7 @@ const updateFollowUp = async (req, res) => {
       otherPetsAreFriendly,
       comments,
       image,
+      isSuccessful, // ✅ nuevo campo
     } = req.body;
 
     const followUp = await AdoptionFollowUp.findByPk(id);
@@ -91,6 +96,7 @@ const updateFollowUp = async (req, res) => {
       otherPetsAreFriendly,
       comments,
       image,
+      isSuccessful, // ✅ incluir
     });
 
     res.status(200).json({
@@ -145,9 +151,74 @@ const getFollowUpsByAdoption = async (req, res) => {
   }
 };
 
+//Obtener reporte de seguimiento por Id de mascota
+const getFollowUpsByPetId = async (req, res) => {
+  try {
+    const { petId } = req.params;
+
+    const followUps = await AdoptionFollowUp.findAll({
+      include: [
+        {
+          model: CompletedAdoption,
+          include: [
+            {
+              model: AdoptionRequest,
+              where: { petId },
+              attributes: [], // no incluir datos del request en la respuesta
+            },
+          ],
+          attributes: [], // no incluir datos de completedAdoption
+        },
+      ],
+      order: [["visitDate", "DESC"]],
+    });
+
+    res.status(200).json(followUps);
+  } catch (error) {
+    console.error("Error al obtener seguimientos por mascota:", error);
+    res.status(500).json({
+      message: "Error al obtener seguimientos: " + error.message,
+    });
+  }
+};
+
+//Establecer un valor para isSuccesful para un seguimiento
+const setFollowUpSuccess = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { isSuccessful } = req.body;
+
+    if (typeof isSuccessful !== "boolean") {
+      return res.status(400).json({
+        message: "El valor de isSuccessful debe ser booleano (true o false).",
+      });
+    }
+
+    const followUp = await AdoptionFollowUp.findByPk(id);
+    if (!followUp) {
+      return res.status(404).json({ message: "Seguimiento no encontrado." });
+    }
+
+    followUp.isSuccessful = isSuccessful;
+    await followUp.save();
+
+    res.status(200).json({
+      message: "Estado de éxito actualizado correctamente.",
+      followUp,
+    });
+  } catch (error) {
+    console.error("Error al actualizar isSuccessful:", error);
+    res.status(500).json({
+      message: "Error al actualizar estado: " + error.message,
+    });
+  }
+};
+
 module.exports = {
   createFollowUp,
   updateFollowUp,
   deleteFollowUp,
   getFollowUpsByAdoption,
+  getFollowUpsByPetId,
+  setFollowUpSuccess,
 };

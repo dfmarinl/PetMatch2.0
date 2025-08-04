@@ -3,13 +3,14 @@ import toast from "react-hot-toast";
 import { io } from "socket.io-client";
 import { getAllPets } from "../api/pet";
 import { getAllUsers, deleteUser, updateUser } from "../api/users";
-import { getAllRequests, updateRequestStatus , getCompletedAdoptions } from "../api/requests";
+import {
+  getAllRequests,
+  updateRequestStatus,
+  getCompletedAdoptions,
+} from "../api/requests";
 import { useAuth } from "../App";
 import { PawPrint } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
-
-
 
 // Components
 import Header from "../components/Header";
@@ -20,9 +21,6 @@ import RequestsTab from "../components/RequestsTab";
 import UsersTab from "../components/UsersTab";
 import AdoptionsTab from "../components/AdoptionsTab";
 import FollowUpModal from "../components/Modales/FollowUpModal";
-
-
-
 
 // Modals
 import PetModal from "../components/Modales/PetModal";
@@ -36,7 +34,6 @@ const AdminDashboard = () => {
   const { user, logout } = useAuth();
   const [activeTab, setActiveTab] = useState("overview");
   const navigate = useNavigate();
-  
 
   // Pets
   const [apiPets, setApiPets] = useState([]);
@@ -79,7 +76,6 @@ const AdminDashboard = () => {
   const [followUpPet, setFollowUpPet] = useState(null);
   const [followUpsData, setFollowUpsData] = useState([]); // Aquí irá luego la data real desde la API
 
-
   const fetchApiPets = async () => {
     setApiLoading(true);
     try {
@@ -94,15 +90,14 @@ const AdminDashboard = () => {
   };
 
   const fetchCompletedAdoptions = async () => {
-  try {
-    const response = await getCompletedAdoptions();
-    setCompletedAdoptions(response || []);
-    console.log(response);
-  } catch (error) {
-    console.error("Error al cargar adopciones completadas:", error);
-  }
-};
-
+    try {
+      const response = await getCompletedAdoptions();
+      setCompletedAdoptions(response || []);
+      console.log(response);
+    } catch (error) {
+      console.error("Error al cargar adopciones completadas:", error);
+    }
+  };
 
   const fetchApiUsers = async () => {
     setApiUsersLoading(true);
@@ -118,49 +113,47 @@ const AdminDashboard = () => {
   };
 
   const handleFollowUp = (pet) => {
-  setFollowUpPet(pet);
+    setFollowUpPet(pet);
 
-  // Datos simulados por ahora
-  const mockFollowUps = [
-  {
-    id: 1,
-    visitDate: "2025-07-01",
-    petIsHealthy: true,
-    hasProperNutrition: true,
-    showsAffectionBond: true,
-    otherPetsAreFriendly: true,
-    comments: "La mascota está en excelente estado.",
-    images: [
-      "https://placekitten.com/300/200",
-      "https://images.unsplash.com/photo-1558788353-f76d92427f16?auto=format&fit=crop&w=300&q=80"
-    ],
-  },
-  {
-    id: 2,
-    visitDate: "2025-07-15",
-    petIsHealthy: true,
-    hasProperNutrition: false,
-    showsAffectionBond: true,
-    otherPetsAreFriendly: false,
-    comments: "Se recomienda mejorar la alimentación.",
-    images: [
-      "https://placedog.net/300/200",
-      "https://images.unsplash.com/photo-1601758123927-196d5f3c7607?auto=format&fit=crop&w=300&q=80"
-    ],
-  }
-];
+    // Datos simulados por ahora
+    const mockFollowUps = [
+      {
+        id: 1,
+        visitDate: "2025-07-01",
+        petIsHealthy: true,
+        hasProperNutrition: true,
+        showsAffectionBond: true,
+        otherPetsAreFriendly: true,
+        comments: "La mascota está en excelente estado.",
+        images: [
+          "https://placekitten.com/300/200",
+          "https://images.unsplash.com/photo-1558788353-f76d92427f16?auto=format&fit=crop&w=300&q=80",
+        ],
+      },
+      {
+        id: 2,
+        visitDate: "2025-07-15",
+        petIsHealthy: true,
+        hasProperNutrition: false,
+        showsAffectionBond: true,
+        otherPetsAreFriendly: false,
+        comments: "Se recomienda mejorar la alimentación.",
+        images: [
+          "https://placedog.net/300/200",
+          "https://images.unsplash.com/photo-1601758123927-196d5f3c7607?auto=format&fit=crop&w=300&q=80",
+        ],
+      },
+    ];
 
-  setFollowUpsData(mockFollowUps);
-  setShowFollowUpModal(true);
-};
-
+    setFollowUpsData(mockFollowUps);
+    setShowFollowUpModal(true);
+  };
 
   const fetchAdoptionRequests = async () => {
     setAdoptionLoading(true);
     try {
       const response = await getAllRequests();
       setAdoptionRequests(response || []);
-
     } catch (error) {
       setAdoptionError("Error al cargar solicitudes de adopción");
     } finally {
@@ -180,42 +173,43 @@ const AdminDashboard = () => {
 
   // Socket.IO: conexión para admins
   useEffect(() => {
-  if (!user) return;
+    if (!user) return;
 
-  socketRef.current = io("http://localhost:3001"); // Cambia si es producción
-  socketRef.current.emit("join", "admins");
+    socketRef.current = io("http://localhost:3001"); // Cambia si es producción
+    socketRef.current.emit("join", "admins");
 
-  socketRef.current.on("new_adoption_request", (data) => {
-    toast.custom((t) => (
-      <div
-        className={`max-w-sm w-full bg-white border-l-4 border-green-500 shadow-lg rounded-lg p-4 flex gap-4 transition-all duration-300 ${
-          t.visible ? "animate-enter" : "animate-leave"
-        }`}
-      >
-        <div className="flex items-start justify-center pt-1">
-          <PawPrint className="text-green-600" size={28} />
+    socketRef.current.on("new_adoption_request", (data) => {
+      toast.custom((t) => (
+        <div
+          className={`max-w-sm w-full bg-white border-l-4 border-green-500 shadow-lg rounded-lg p-4 flex gap-4 transition-all duration-300 ${
+            t.visible ? "animate-enter" : "animate-leave"
+          }`}
+        >
+          <div className="flex items-start justify-center pt-1">
+            <PawPrint className="text-green-600" size={28} />
+          </div>
+          <div className="flex-1">
+            <h4 className="text-sm font-semibold text-gray-800">
+              Nueva solicitud de adopción
+            </h4>
+            <p className="text-sm text-gray-600 mt-1 leading-snug">
+              <span className="font-medium">{data.userName}</span> quiere
+              adoptar a <span className="font-medium">{data.petName}</span>.
+            </p>
+          </div>
         </div>
-        <div className="flex-1">
-          <h4 className="text-sm font-semibold text-gray-800">Nueva solicitud de adopción</h4>
-          <p className="text-sm text-gray-600 mt-1 leading-snug">
-            <span className="font-medium">{data.userName}</span> quiere adoptar a <span className="font-medium">{data.petName}</span>.
-          </p>
-        </div>
-      </div>
-    ));
-    fetchAdoptionRequests();
+      ));
+      fetchAdoptionRequests();
 
-     setTimeout(() => {
+      setTimeout(() => {
         navigate(0);
       }, 3000); // Espera 3 segundos antes de navegar
+    });
 
-  });
-   
-  
-  return () => {
-    socketRef.current.disconnect();
-  };
-}, [user]);
+    return () => {
+      socketRef.current.disconnect();
+    };
+  }, [user]);
 
   useEffect(() => {
     fetchApiPets();
@@ -224,7 +218,6 @@ const AdminDashboard = () => {
     if (activeTab === "users" && user?.rol !== "empleado") fetchApiUsers();
     if (activeTab === "requests") fetchAdoptionRequests();
     if (activeTab === "adoptions") fetchCompletedAdoptions();
-
   }, [activeTab, user]);
 
   const handleCreatePet = () => {
@@ -287,9 +280,8 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen bg-[#f8f9fa]">
-      
       <Header user={user} onLogout={logout} />
-     
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <NavigationTabs
           activeTab={activeTab}
@@ -326,10 +318,11 @@ const AdminDashboard = () => {
           />
         )}
         {activeTab === "adoptions" && (
-          <AdoptionsTab adoptions={completedAdoptions} onFollowUp={handleFollowUp} />
+          <AdoptionsTab
+            adoptions={completedAdoptions}
+            onFollowUp={handleFollowUp}
+          />
         )}
-
-
 
         {activeTab === "requests" && (
           <RequestsTab
@@ -406,11 +399,11 @@ const AdminDashboard = () => {
         followUps={followUpsData}
       />
 
-
       {/* Footer */}
       <footer className="bg-[#1f2937] text-gray-300 py-4 mt-auto">
         <div className="max-w-7xl mx-auto px-4 text-center text-sm text-gray-300">
-          © 2025 PetMatch. Todos los derechos reservados. Desarrollado por el equipo de PetMatch.
+          © 2025 PetMatch. Todos los derechos reservados. Desarrollado por el
+          equipo de PetMatch.
         </div>
       </footer>
     </div>
@@ -418,5 +411,3 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
-
-
