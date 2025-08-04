@@ -15,6 +15,11 @@ const FollowUpModal = ({
   const pet = adoption?.AdoptionRequest?.Pet;
   const user = adoption?.AdoptionRequest?.User;
 
+  const renderHealthNutritionValue = (value) => {
+    if (value === null) return "No aplica";
+    return value ? "Aceptable" : "Mala";
+  };
+
   const renderBooleanValue = (value) => {
     if (value === null) return "No aplica";
     return value ? "Sí" : "No";
@@ -24,10 +29,10 @@ const FollowUpModal = ({
     <>
       {/* Fondo con blur */}
       <div className="fixed inset-0 z-50 backdrop-blur-sm bg-white/30 flex justify-center items-center">
-        <div className="bg-white rounded-lg p-6 max-w-6xl w-full shadow-lg relative overflow-auto max-h-[80vh]">
+        <div className="bg-white rounded-lg p-6 max-w-7xl w-full shadow-lg relative overflow-auto max-h-[85vh]">
           <button
             onClick={onClose}
-            className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+            className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 z-10"
           >
             <XCircle size={24} />
           </button>
@@ -62,19 +67,21 @@ const FollowUpModal = ({
               <p>Cargando seguimientos...</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm text-left border border-gray-300 rounded">
-                <thead className="bg-gray-100">
+            <div className="overflow-x-auto overflow-y-auto max-h-[50vh]">
+              <table className="w-full text-sm text-left border border-gray-300 rounded min-w-[1000px]">
+                <thead className="bg-gray-100 sticky top-0">
                   <tr>
-                    <th className="px-4 py-2">Fecha</th>
-                    <th className="px-4 py-2">Salud</th>
-                    <th className="px-4 py-2">Nutrición</th>
-                    <th className="px-4 py-2">Vínculo afectivo</th>
-                    <th className="px-4 py-2">
+                    <th className="px-4 py-3 min-w-[100px]">Fecha</th>
+                    <th className="px-4 py-3 min-w-[90px]">Salud</th>
+                    <th className="px-4 py-3 min-w-[90px]">Nutrición</th>
+                    <th className="px-4 py-3 min-w-[120px]">
+                      Vínculo afectivo
+                    </th>
+                    <th className="px-4 py-3 min-w-[150px]">
                       Convive pacíficamente con otras mascotas
                     </th>
-                    <th className="px-4 py-2">Comentarios</th>
-                    <th className="px-4 py-2">Imagen</th>
+                    <th className="px-4 py-3 min-w-[250px]">Comentarios</th>
+                    <th className="px-4 py-3 min-w-[100px]">Imagen</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -82,7 +89,7 @@ const FollowUpModal = ({
                     <tr>
                       <td
                         colSpan="7"
-                        className="px-4 py-4 text-center text-gray-500"
+                        className="px-4 py-8 text-center text-gray-500"
                       >
                         No hay seguimientos registrados aún.
                       </td>
@@ -93,39 +100,86 @@ const FollowUpModal = ({
                         (a, b) => new Date(b.visitDate) - new Date(a.visitDate)
                       )
                       .map((item) => (
-                        <tr key={item.id} className="border-t border-gray-200">
-                          <td className="px-4 py-2">
+                        <tr
+                          key={item.id}
+                          className="border-t border-gray-200 hover:bg-gray-50"
+                        >
+                          <td className="px-4 py-3 align-top">
                             {new Date(item.visitDate).toLocaleDateString()}
                           </td>
-                          <td className="px-4 py-2">
-                            {renderBooleanValue(item.petIsHealthy)}
+                          <td className="px-4 py-3 align-top">
+                            <span
+                              className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                item.petIsHealthy === null
+                                  ? "bg-gray-100 text-gray-600"
+                                  : item.petIsHealthy
+                                  ? "bg-green-100 text-green-700"
+                                  : "bg-red-100 text-red-700"
+                              }`}
+                            >
+                              {renderHealthNutritionValue(item.petIsHealthy)}
+                            </span>
                           </td>
-                          <td className="px-4 py-2">
-                            {renderBooleanValue(item.hasProperNutrition)}
+                          <td className="px-4 py-3 align-top">
+                            <span
+                              className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                item.hasProperNutrition === null
+                                  ? "bg-gray-100 text-gray-600"
+                                  : item.hasProperNutrition
+                                  ? "bg-green-100 text-green-700"
+                                  : "bg-red-100 text-red-700"
+                              }`}
+                            >
+                              {renderHealthNutritionValue(
+                                item.hasProperNutrition
+                              )}
+                            </span>
                           </td>
-                          <td className="px-4 py-2">
-                            {renderBooleanValue(item.showsAffectionBond)}
+                          <td className="px-4 py-3 align-top">
+                            <span
+                              className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                item.showsAffectionBond === null
+                                  ? "bg-gray-100 text-gray-600"
+                                  : item.showsAffectionBond
+                                  ? "bg-green-100 text-green-700"
+                                  : "bg-red-100 text-red-700"
+                              }`}
+                            >
+                              {renderBooleanValue(item.showsAffectionBond)}
+                            </span>
                           </td>
-                          <td className="px-4 py-2">
-                            {renderBooleanValue(item.otherPetsAreFriendly)}
+                          <td className="px-4 py-3 align-top">
+                            <span
+                              className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                item.otherPetsAreFriendly === null
+                                  ? "bg-gray-100 text-gray-600"
+                                  : item.otherPetsAreFriendly
+                                  ? "bg-green-100 text-green-700"
+                                  : "bg-red-100 text-red-700"
+                              }`}
+                            >
+                              {renderBooleanValue(item.otherPetsAreFriendly)}
+                            </span>
                           </td>
-                          <td className="px-4 py-2 max-w-xs">
-                            <div className="truncate" title={item.comments}>
+                          <td className="px-4 py-3 align-top max-w-xs">
+                            <div className="whitespace-pre-wrap break-words leading-relaxed">
                               {item.comments || "-"}
                             </div>
                           </td>
-                          <td className="px-4 py-2">
+                          <td className="px-4 py-3 align-top">
                             {item.image ? (
                               <img
                                 src={item.image}
                                 alt={`seguimiento-${item.id}`}
-                                className="w-12 h-12 object-cover rounded cursor-pointer hover:opacity-80 transition-opacity"
+                                className="w-20 h-20 object-cover rounded cursor-pointer hover:opacity-80 transition-opacity border shadow-sm"
                                 onClick={() => setSelectedImage(item.image)}
                               />
                             ) : (
-                              <span className="text-gray-400 text-xs">
-                                Sin imagen
-                              </span>
+                              <div className="w-20 h-20 bg-gray-100 rounded flex items-center justify-center">
+                                <span className="text-gray-400 text-xs text-center">
+                                  Sin imagen
+                                </span>
+                              </div>
                             )}
                           </td>
                         </tr>
