@@ -11,6 +11,36 @@ const StatusUpdateModal = ({ isOpen, onClose, onConfirm, actionType }) => {
     setObservations("");
   };
 
+  const getModalTitle = () => {
+    switch (actionType) {
+      case "approved":
+        return "Aprobar solicitud";
+      case "rejected":
+        return "Rechazar solicitud";
+      case "suspended":
+        return "Suspender solicitud";
+      case "pending":
+        return "Reactivar solicitud";
+      default:
+        return "Actualizar solicitud";
+    }
+  };
+
+  const getButtonColor = () => {
+    switch (actionType) {
+      case "approved":
+        return "bg-green-600 hover:bg-green-700";
+      case "rejected":
+        return "bg-red-600 hover:bg-red-700";
+      case "suspended":
+        return "bg-purple-600 hover:bg-purple-700";
+      case "pending":
+        return "bg-blue-600 hover:bg-blue-700";
+      default:
+        return "bg-gray-600 hover:bg-gray-700";
+    }
+  };
+
   return (
     <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-white p-6 rounded shadow-lg max-w-md w-full relative">
@@ -21,9 +51,7 @@ const StatusUpdateModal = ({ isOpen, onClose, onConfirm, actionType }) => {
           <X />
         </button>
 
-        <h2 className="text-xl font-semibold mb-4">
-          {actionType === "approved" ? "Aprobar" : "Rechazar"} solicitud
-        </h2>
+        <h2 className="text-xl font-semibold mb-4">{getModalTitle()}</h2>
 
         <label className="block mb-2 font-medium">
           Observaciones (opcional):
@@ -38,11 +66,7 @@ const StatusUpdateModal = ({ isOpen, onClose, onConfirm, actionType }) => {
         <div className="flex justify-end gap-2 mt-4">
           <button
             onClick={handleSubmit}
-            className={`px-4 py-2 rounded text-white ${
-              actionType === "approved"
-                ? "bg-green-600 hover:bg-green-700"
-                : "bg-red-600 hover:bg-red-700"
-            }`}
+            className={`px-4 py-2 rounded text-white ${getButtonColor()}`}
           >
             Confirmar
           </button>
