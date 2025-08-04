@@ -1,23 +1,47 @@
 import React, { useState } from "react";
-import FollowUpsModal from "./Modales/FollowUpModal"; // Asegúrate de tener este modal
+import { getFollowUpsByPetIdRequest } from "../api/followUp"; // Asegúrate de importar la función
+import FollowUpsModal from "./Modales/FollowUpModal";
 
-const AdoptionsTab = ({ adoptions, loading, error }) => {
+const AdoptionsTab = ({ adoptions, loading, error, onFollowUp }) => {
   const [selectedAdoption, setSelectedAdoption] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [followUpsData, setFollowUpsData] = useState([]);
+  const [followUpsLoading, setFollowUpsLoading] = useState(false);
 
-  const handleViewFollowUps = (adoption) => {
+  const handleViewFollowUps = async (adoption) => {
     setSelectedAdoption(adoption);
     setIsModalOpen(true);
+    setFollowUpsLoading(true);
+
+    try {
+      // Obtener el ID de la mascota desde la adopción
+      const petId = adoption.AdoptionRequest?.Pet?.id;
+
+      if (petId) {
+        const followUpsResponse = await getFollowUpsByPetIdRequest(petId);
+        setFollowUpsData(followUpsResponse || []);
+      } else {
+        console.error("No se pudo obtener el ID de la mascota");
+        setFollowUpsData([]);
+      }
+    } catch (error) {
+      console.error("Error al cargar seguimientos:", error);
+      setFollowUpsData([]);
+    } finally {
+      setFollowUpsLoading(false);
+    }
   };
 
   const closeModal = () => {
     setSelectedAdoption(null);
     setIsModalOpen(false);
+    setFollowUpsData([]);
   };
 
   if (loading) return <p>Cargando adopciones...</p>;
   if (error) return <p>Error al cargar las adopciones.</p>;
-  if (!adoptions || adoptions.length === 0) return <p>No hay adopciones completadas.</p>;
+  if (!adoptions || adoptions.length === 0)
+    return <p>No hay adopciones completadas.</p>;
 
   return (
     <>
@@ -87,6 +111,8 @@ const AdoptionsTab = ({ adoptions, loading, error }) => {
           isOpen={isModalOpen}
           onClose={closeModal}
           adoption={selectedAdoption}
+          followUps={followUpsData}
+          loading={followUpsLoading}
         />
       )}
     </>
@@ -94,9 +120,3 @@ const AdoptionsTab = ({ adoptions, loading, error }) => {
 };
 
 export default AdoptionsTab;
-
-
-
-
-
-

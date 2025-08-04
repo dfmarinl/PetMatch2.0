@@ -6,6 +6,8 @@ const {
   updateFollowUp,
   deleteFollowUp,
   getFollowUpsByAdoption,
+  getFollowUpsByPetId,
+  setFollowUpSuccess,
 } = require("../views/followUpController");
 
 const {
@@ -39,6 +41,20 @@ router.get(
   verifyToken,
   authorizeRoles("empleado", "administrador", "cliente"),
   getFollowUpsByAdoption
+);
+
+router.get(
+  "/followups/byPet/:petId",
+  verifyToken,
+  authorizeRoles("empleado", "administrador"),
+  getFollowUpsByPetId
+);
+
+router.patch(
+  "/followups/:id/success",
+  verifyToken,
+  authorizeRoles("empleado", "administrador"),
+  setFollowUpSuccess
 );
 
 module.exports = router;
