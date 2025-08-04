@@ -9,7 +9,7 @@ import {
   getCompletedAdoptions,
 } from "../api/requests";
 import { useAuth } from "../App";
-import { PawPrint } from "lucide-react";
+import { PawPrint, FileText  } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 // Components
@@ -173,43 +173,72 @@ const AdminDashboard = () => {
 
   // Socket.IO: conexión para admins
   useEffect(() => {
-    if (!user) return;
+  if (!user) return;
 
-    socketRef.current = io("http://localhost:3001"); // Cambia si es producción
-    socketRef.current.emit("join", "admins");
+  socketRef.current = io("http://localhost:3001"); // Cambia si es producción
+  socketRef.current.emit("join", "admins");
 
-    socketRef.current.on("new_adoption_request", (data) => {
-      toast.custom((t) => (
-        <div
-          className={`max-w-sm w-full bg-white border-l-4 border-green-500 shadow-lg rounded-lg p-4 flex gap-4 transition-all duration-300 ${
-            t.visible ? "animate-enter" : "animate-leave"
-          }`}
-        >
-          <div className="flex items-start justify-center pt-1">
-            <PawPrint className="text-green-600" size={28} />
-          </div>
-          <div className="flex-1">
-            <h4 className="text-sm font-semibold text-gray-800">
-              Nueva solicitud de adopción
-            </h4>
-            <p className="text-sm text-gray-600 mt-1 leading-snug">
-              <span className="font-medium">{data.userName}</span> quiere
-              adoptar a <span className="font-medium">{data.petName}</span>.
-            </p>
-          </div>
+  // Evento: nueva solicitud de adopción
+  socketRef.current.on("new_adoption_request", (data) => {
+    toast.custom((t) => (
+      <div
+        className={`max-w-sm w-full bg-white border-l-4 border-green-500 shadow-lg rounded-lg p-4 flex gap-4 transition-all duration-300 ${
+          t.visible ? "animate-enter" : "animate-leave"
+        }`}
+      >
+        <div className="flex items-start justify-center pt-1">
+          <PawPrint className="text-green-600" size={28} />
         </div>
-      ));
-      fetchAdoptionRequests();
+        <div className="flex-1">
+          <h4 className="text-sm font-semibold text-gray-800">
+            Nueva solicitud de adopción
+          </h4>
+          <p className="text-sm text-gray-600 mt-1 leading-snug">
+            <span className="font-medium">{data.userName}</span> quiere adoptar a{" "}
+            <span className="font-medium">{data.petName}</span>.
+          </p>
+        </div>
+      </div>
+    ));
+    fetchAdoptionRequests();
 
-      setTimeout(() => {
-        navigate(0);
-      }, 3000); // Espera 3 segundos antes de navegar
-    });
+    setTimeout(() => {
+      navigate(0);
+    }, 3000);
+  });
 
-    return () => {
-      socketRef.current.disconnect();
-    };
-  }, [user]);
+  // 🆕 Evento: nuevo seguimiento post-adopción
+  socketRef.current.on("new_follow_up", (data) => {
+    toast.custom((t) => (
+      <div
+        className={`max-w-sm w-full bg-white border-l-4 border-blue-500 shadow-lg rounded-lg p-4 flex gap-4 transition-all duration-300 ${
+          t.visible ? "animate-enter" : "animate-leave"
+        }`}
+      >
+        <div className="flex items-start justify-center pt-1">
+          <FileText className="text-blue-600" size={26} />
+        </div>
+        <div className="flex-1">
+          <h4 className="text-sm font-semibold text-gray-800">
+            Nuevo seguimiento post-adopción
+          </h4>
+          <p className="text-sm text-gray-600 mt-1 leading-snug">
+            {data.userName} ha registrado un seguimiento para{" "}
+            <span className="font-medium">{data.petName}</span>.
+          </p>
+        </div>
+      </div>
+    ));
+    setTimeout(() => {
+      navigate(0); // Refresca la vista después de unos segundos
+    }, 3000);
+  });
+
+  return () => {
+    socketRef.current.disconnect();
+  };
+}, [user]);
+
 
   useEffect(() => {
     fetchApiPets();

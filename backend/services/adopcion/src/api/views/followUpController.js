@@ -3,7 +3,10 @@ const {
   CompletedAdoption,
   AdoptionRequest,
   Pet,
+  User,
+  Notification,
 } = require("../../../../../models");
+const { sendEmail } = require("../../../../utils/emailSender");
 
 //Crear un reporte de seguimiento
 const createFollowUp = async (req, res) => {
@@ -17,13 +20,11 @@ const createFollowUp = async (req, res) => {
       otherPetsAreFriendly,
       comments,
       image,
-      isSuccessful, // ✅ nuevo campo
+      isSuccessful,
     } = req.body;
 
     if (!completedAdoptionId) {
-      return res
-        .status(400)
-        .json({ message: "Falta el ID de adopción completada." });
+      return res.status(400).json({ message: "Falta el ID de adopción completada." });
     }
 
     if (
@@ -32,16 +33,19 @@ const createFollowUp = async (req, res) => {
       showsAffectionBond === undefined
     ) {
       return res.status(400).json({
-        message:
-          "Faltan respuestas obligatorias del estado de la mascota y su entorno.",
+        message: "Faltan respuestas obligatorias del estado de la mascota y su entorno.",
       });
     }
 
-    const adoption = await CompletedAdoption.findByPk(completedAdoptionId);
+    const adoption = await CompletedAdoption.findByPk(completedAdoptionId, {
+      include: {
+        model: AdoptionRequest,
+        include: [User, Pet],
+      },
+    });
+
     if (!adoption) {
-      return res
-        .status(404)
-        .json({ message: "Adopción completada no encontrada." });
+      return res.status(404).json({ message: "Adopción completada no encontrada." });
     }
 
     const newFollowUp = await AdoptionFollowUp.create({
@@ -53,7 +57,60 @@ const createFollowUp = async (req, res) => {
       otherPetsAreFriendly,
       comments,
       image,
-      isSuccessful, // ✅ incluir
+      isSuccessful,
+    });
+
+    // Acceso a datos relacionados
+    const adoptante = adoption.AdoptionRequest?.User;
+    const mascota = adoption.AdoptionRequest?.Pet;
+
+    const petName = mascota?.name || "una mascota";
+    const userName = adoptante
+      ? `${adoptante.firstName} ${adoptante.lastName}`
+      : "Un empleado";
+
+    const notificationMessage = `Se ha registrado un nuevo seguimiento post-adopción para ${petName}.`;
+
+    // Notificaciones en BD
+    await Notification.bulkCreate([
+      {
+        userId: null,
+        rol: "administrador",
+        message: notificationMessage,
+        type: "nuevoSeguimiento",
+      },
+      {
+        userId: null,
+        rol: "empleado",
+        message: notificationMessage,
+        type: "nuevoSeguimiento",
+      },
+    ]);
+
+    // Correos
+    const staff = await User.findAll({
+      where: { rol: ["administrador", "empleado"] },
+    });
+
+    const emails = staff.map((u) => u.email);
+    await Promise.all(
+      emails.map((email) =>
+        sendEmail("newFollowUpReport", email, {
+          petName,
+          userName,
+          reportLink: "http://localhost:3000/admin/adopciones",
+        })
+      )
+    );
+
+    // Emitir socket
+    const io = req.app.get("io");
+    io.to("admins").emit("new_follow_up", {
+      message: notificationMessage,
+      type: "nuevoSeguimiento",
+      petName,
+      userName,
+      createdAt: new Date(),
     });
 
     res.status(201).json({
@@ -62,12 +119,9 @@ const createFollowUp = async (req, res) => {
     });
   } catch (error) {
     console.error("Error al crear el reporte:", error);
-    res
-      .status(500)
-      .json({ message: "Error al crear el reporte: " + error.message });
+    res.status(500).json({ message: "Error al crear el reporte: " + error.message });
   }
 };
-
 //Actualizar un reporte de seguimiento
 const updateFollowUp = async (req, res) => {
   try {
@@ -160,14 +214,16 @@ const getFollowUpsByPetId = async (req, res) => {
       include: [
         {
           model: CompletedAdoption,
+          required: true, // 🔴 Esto asegura que solo traiga los relacionados
           include: [
             {
               model: AdoptionRequest,
+              required: true, // 🔴 Forzar INNER JOIN para aplicar el where
               where: { petId },
-              attributes: [], // no incluir datos del request en la respuesta
+              attributes: [],
             },
           ],
-          attributes: [], // no incluir datos de completedAdoption
+          attributes: [],
         },
       ],
       order: [["visitDate", "DESC"]],
