@@ -39,6 +39,34 @@ const emailTemplates = {
     `,
   }),
 
+  adoptionSuspended: ({ userName, petName, observations }) => ({
+    subject: "Tu solicitud fue suspendida ⏸️",
+    html: `
+    <h2>Hola ${userName},</h2>
+    <p>Queremos informarte que tu solicitud para adoptar a <strong>${petName}</strong> ha sido <strong>suspendida temporalmente</strong>.</p>
+    ${
+      observations
+        ? `<p>Motivo de la suspensión: <em>${observations}</em></p>`
+        : "<p>No se especificó un motivo en este momento.</p>"
+    }
+    <p>Esto no significa que tu solicitud haya sido rechazada. Revisa tu solicitud y vuelve a enviarla.</p>
+    <br/>
+    <p>Gracias por tu comprensión.</p>
+    <p>El equipo de PetMatch 🐾</p>
+  `,
+  }),
+
+  adoptionReactivated: ({ userName, petName }) => ({
+    subject: "Tu solicitud ha sido reactivada 🐾",
+    html: `
+    <h2>Hola ${userName},</h2>
+    <p>Queremos informarte que tu solicitud para adoptar a <strong>${petName}</strong> ha sido <strong>reactivada</strong> y nuevamente está en proceso de evaluación.</p>
+    <p>Te mantendremos informado sobre cualquier novedad. Agradecemos tu interés y compromiso con la adopción responsable.</p>
+    <br/>
+    <p>El equipo de PetMatch 🐾</p>
+  `,
+  }),
+
   passwordReset: ({ userName, resetLink }) => ({
     subject: "Recuperación de contraseña - PetMatch",
     html: `
@@ -57,8 +85,8 @@ const emailTemplates = {
   }),
 
   newAdoptionRequest: ({ userName, petName, requestLink }) => ({
-  subject: "📢 Nueva solicitud de adopción recibida",
-  html: `
+    subject: "📢 Nueva solicitud de adopción recibida",
+    html: `
     <div style="font-family: Arial, sans-serif; padding: 20px;">
       <h2>Hola,</h2>
       <p>Se ha generado una nueva solicitud de adopción para la mascota <strong>${petName}</strong>.</p>
@@ -69,8 +97,6 @@ const emailTemplates = {
     </div>
   `,
   }),
-
-  
 };
 
 // Función principal para enviar correos
@@ -98,4 +124,3 @@ const sendEmail = async (type, to, data) => {
 };
 
 module.exports = { sendEmail };
-

@@ -60,17 +60,17 @@ const createAdoptionRequest = async (req, res) => {
 
     // Crear notificación en la base de datos para admins
     await Notification.create({
-     userId: null, // Notificación general
-     rol: "administrador", // O "empleado", dependiendo de a quién va dirigida
-     message: notificationMessage,
-     type: "nuevaSolicitud",
+      userId: null, // Notificación general
+      rol: "administrador", // O "empleado", dependiendo de a quién va dirigida
+      message: notificationMessage,
+      type: "nuevaSolicitud",
     });
 
     await Notification.create({
-     userId: null, // Notificación general
-     rol: "empleado", // O "empleado", dependiendo de a quién va dirigida
-     message: notificationMessage,
-     type: "nuevaSolicitud",
+      userId: null, // Notificación general
+      rol: "empleado", // O "empleado", dependiendo de a quién va dirigida
+      message: notificationMessage,
+      type: "nuevaSolicitud",
     });
 
     // Enviar correos a administradores y empleados
@@ -120,7 +120,8 @@ const updateAdoptionRequestStatus = async (req, res) => {
     const { id } = req.params;
     const { status, observations } = req.body;
 
-    if (!["approved", "rejected"].includes(status)) {
+    const validStatuses = ["approved", "rejected", "suspended", "pending"];
+    if (!validStatuses.includes(status)) {
       return res.status(400).json({ message: "Estado inválido." });
     }
 
@@ -132,6 +133,13 @@ const updateAdoptionRequestStatus = async (req, res) => {
       return res.status(404).json({ message: "Solicitud no encontrada." });
     }
 
+    const previousStatus = request.adoptionStatus;
+    if (previousStatus === "approved" && status !== "approved") {
+      return res.status(400).json({
+        message: "No se puede modificar una solicitud ya aprobada.",
+      });
+    }
+
     request.adoptionStatus = status;
     request.observations = observations || null;
     await request.save();
@@ -140,6 +148,7 @@ const updateAdoptionRequestStatus = async (req, res) => {
     let notificationType = "";
     let deliveryDate = null;
 
+    // Dependiendo del nuevo estado, realizar acciones
     if (status === "approved") {
       const daysToAdd = Math.floor(Math.random() * (15 - 3 + 1)) + 3;
       deliveryDate = new Date();
@@ -155,45 +164,68 @@ const updateAdoptionRequestStatus = async (req, res) => {
       const pet = await Pet.findByPk(request.petId);
       if (pet) await pet.update({ available: false });
 
-      // Enviar correo de aprobación
       await sendEmail("adoptionApproved", request.User.email, {
         userName: request.User.firstName,
         petName: request.Pet.name,
         deliveryDate,
       });
 
-      notificationMessage = `¡Tu solicitud de adopción para ${request.Pet.name} fue aprobada! Fecha estimada de entrega: ${deliveryDate.toLocaleDateString()}`;
+      notificationMessage = `¡Tu solicitud de adopción para ${
+        request.Pet.name
+      } fue aprobada! Fecha estimada de entrega: ${deliveryDate.toLocaleDateString()}`;
       notificationType = "aprobacion";
-
     } else if (status === "rejected") {
-      // Enviar correo de rechazo
       await sendEmail("adoptionRejected", request.User.email, {
         userName: request.User.firstName,
         petName: request.Pet.name,
         observations,
       });
 
-      notificationMessage = `Tu solicitud de adopción para ${request.Pet.name} fue rechazada. Observaciones: ${observations || "No especificadas."}`;
+      notificationMessage = `Tu solicitud de adopción para ${
+        request.Pet.name
+      } fue rechazada. Observaciones: ${observations || "No especificadas."}`;
       notificationType = "rechazo";
+    } else if (status === "suspended") {
+      await sendEmail("adoptionSuspended", request.User.email, {
+        userName: request.User.firstName,
+        petName: request.Pet.name,
+        observations,
+      });
+
+      notificationMessage = `Tu solicitud de adopción para ${request.Pet.name} ha sido suspendida temporalmente.`;
+      notificationType = "suspension";
+    } else if (status === "pending") {
+      await sendEmail("adoptionReactivated", request.User.email, {
+        userName: request.User.firstName,
+        petName: request.Pet.name,
+      });
+
+      notificationMessage = `Tu solicitud de adopción para ${request.Pet.name} ha sido reactivada y está nuevamente en revisión.`;
+      notificationType = "reactivacion";
     }
 
-    // Crear notificación para el usuario
+    // Crear notificación
     const notification = await Notification.create({
       userId: request.userId,
       rol: "cliente",
       message: notificationMessage,
       type: notificationType,
     });
-    const io = req.app.get("io");
-    // Emitir la notificación al cliente
-    io.to(request.userId.toString()).emit("nuevaNotificacion", {
-  notification,
-});
 
-    res.status(200).json({ message: "Estado de la solicitud actualizado correctamente." });
+    const io = req.app.get("io");
+    io.to(request.userId.toString()).emit("nuevaNotificacion", {
+      notification,
+    });
+
+    res.status(200).json({
+      message: "Estado de la solicitud actualizado correctamente.",
+      newStatus: status,
+    });
   } catch (error) {
     console.error("Error al actualizar solicitud:", error);
-    res.status(500).json({ message: "Error al actualizar solicitud: " + error.message });
+    res.status(500).json({
+      message: "Error al actualizar solicitud: " + error.message,
+    });
   }
 };
 
@@ -202,8 +234,11 @@ const getAllRequests = async (req, res) => {
   try {
     const requests = await AdoptionRequest.findAll({
       include: [
-        { model: Pet, attributes: ["name","image","available"] },
-        { model: CompletedAdoption, attributes: ["approvalDate", "deliveryDate"] },
+        { model: Pet, attributes: ["name", "image", "available"] },
+        {
+          model: CompletedAdoption,
+          attributes: ["approvalDate", "deliveryDate"],
+        },
       ],
       order: [["id", "DESC"]],
     });
@@ -211,7 +246,9 @@ const getAllRequests = async (req, res) => {
     res.status(200).json(requests);
   } catch (error) {
     console.error("Error al obtener todas las solicitudes:", error);
-    res.status(500).json({ message: "Error al obtener solicitudes: " + error.message });
+    res
+      .status(500)
+      .json({ message: "Error al obtener solicitudes: " + error.message });
   }
 };
 
@@ -238,7 +275,11 @@ const getRequestsByUser = async (req, res) => {
     res.status(200).json(requests);
   } catch (error) {
     console.error("Error al obtener solicitudes del usuario:", error);
-    res.status(500).json({ message: "Error al obtener solicitudes del usuario: " + error.message });
+    res
+      .status(500)
+      .json({
+        message: "Error al obtener solicitudes del usuario: " + error.message,
+      });
   }
 };
 
@@ -263,7 +304,11 @@ const getCompletedAdoptionsByUser = async (req, res) => {
     res.status(200).json(adoptions);
   } catch (error) {
     console.error("Error al obtener adopciones completadas:", error);
-    res.status(500).json({ message: "Error al obtener adopciones completadas: " + error.message });
+    res
+      .status(500)
+      .json({
+        message: "Error al obtener adopciones completadas: " + error.message,
+      });
   }
 };
 
@@ -291,7 +336,9 @@ const deleteAdoptionRequest = async (req, res) => {
     res.status(200).json({ message: "Solicitud eliminada correctamente." });
   } catch (error) {
     console.error("Error al eliminar solicitud:", error);
-    res.status(500).json({ message: "Error al eliminar solicitud: " + error.message });
+    res
+      .status(500)
+      .json({ message: "Error al eliminar solicitud: " + error.message });
   }
 };
 
@@ -319,7 +366,9 @@ const getRequestsPaginated = async (req, res) => {
     });
   } catch (error) {
     console.error("Error al paginar solicitudes:", error);
-    res.status(500).json({ message: "Error al paginar solicitudes: " + error.message });
+    res
+      .status(500)
+      .json({ message: "Error al paginar solicitudes: " + error.message });
   }
 };
 
@@ -354,7 +403,11 @@ const getAllCompletedAdoptions = async (req, res) => {
     res.status(200).json(completedAdoptions);
   } catch (error) {
     console.error("Error al obtener adopciones completadas:", error);
-    res.status(500).json({ message: "Error al obtener adopciones completadas: " + error.message });
+    res
+      .status(500)
+      .json({
+        message: "Error al obtener adopciones completadas: " + error.message,
+      });
   }
 };
 

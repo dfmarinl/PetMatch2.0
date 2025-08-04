@@ -37,7 +37,7 @@ const AdoptionRequest = sequelize.define("AdoptionRequest", {
     allowNull: false,
   },
   adoptionStatus: {
-    type: DataTypes.ENUM("pending", "approved", "rejected"),
+    type: DataTypes.ENUM("pending", "approved", "rejected", "suspended"),
     allowNull: false,
     defaultValue: "pending",
   },
