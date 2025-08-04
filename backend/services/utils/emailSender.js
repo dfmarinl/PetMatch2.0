@@ -69,6 +69,24 @@ const emailTemplates = {
     </div>
   `,
   }),
+  
+
+  newFollowUpReport: ({ userName, petName, reportLink }) => ({
+  subject: "📋 Nuevo reporte de seguimiento post-adopción",
+  html: `
+    <div style="font-family: Arial, sans-serif; padding: 20px;">
+      <h2>Hola,</h2>
+      <p>Se ha registrado un nuevo <strong>seguimiento post-adopción</strong> para la mascota <strong>${petName}</strong> por parte del usuario <strong>${userName}</strong>.</p>
+      <p>Puedes revisar el reporte completo en el siguiente enlace:</p>
+      <a href="${reportLink}" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; margin-top: 10px;">
+        Ver reporte
+      </a>
+      <br/>
+      <p style="margin-top: 20px;">Gracias por tu compromiso con PetMatch 🐾</p>
+    </div>
+  `,
+}),
+
 
   
 };
