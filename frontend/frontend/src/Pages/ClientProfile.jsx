@@ -10,6 +10,16 @@ import { useAuth } from "../App";
 import { useNavigate } from "react-router-dom";
 import NotificationBell from "../components/NotificationBell";
 
+const translateAdoptionStatus = (status) => {
+  const translations = {
+    pending: "Pendiente",
+    approved: "Aprobada",
+    rejected: "Rechazada",
+    suspended: "Suspendida",
+  };
+  return translations[status] || status;
+};
+
 const ClientProfile = () => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -257,7 +267,9 @@ const ClientProfile = () => {
                       <tr key={req.id} className="border-t">
                         <td className="px-4 py-2">{req.id}</td>
                         <td className="px-4 py-2">{req.Pet.name}</td>
-                        <td className="px-4 py-2">{req.adoptionStatus}</td>
+                        <td className="px-4 py-2">
+                          {translateAdoptionStatus(req.adoptionStatus)}
+                        </td>
                         <td className="px-4 py-2 truncate max-w-xs">
                           {req.reasonForAdoption}
                         </td>
