@@ -1,11 +1,11 @@
 import axios from "axios";
 
-const API_URL = "https://petmatch2-0.onrender.com/";
+const API_URL = "https://petmatch2-0.onrender.com"; // Removed trailing slash
 
 // Iniciar sesión y guardar token
 export const loginRequest = async (email, password) => {
   try {
-    const response = await axios.post("https://petmatch2-0.onrender.com/api/auth/login", {
+    const response = await axios.post(`${API_URL}/api/auth/login`, {
       email,
       password,
     });
@@ -44,7 +44,7 @@ export const getMeRequest = async () => {
 export const registerRequest = async (userData) => {
   try {
     const response = await axios.post(
-      "https://petmatch2-0.onrender.com/api/auth/register",
+      `${API_URL}/api/auth/register`,
       userData
     );
 
