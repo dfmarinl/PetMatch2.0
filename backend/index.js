@@ -1,3 +1,5 @@
+// index.js
+
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
@@ -5,7 +7,7 @@ const http = require("http");
 const { Server } = require("socket.io");
 const { sequelize } = require("./models");
 
-// Rutas
+// === RUTAS ===
 const userRoutes = require("./services/usuario/src/api/routes/userRoutes");
 const authRoutes = require("./services/usuario/src/api/routes/authRoutes");
 const petRoutes = require("./services/mascota/src/api/routes/petRoutes");
@@ -13,6 +15,7 @@ const adoptionRoutes = require("./services/adopcion/src/api/routes/adoptionRoute
 const followUpRoutes = require("./services/adopcion/src/api/routes/followUpRoutes");
 const notificationRoutes = require("./services/notificacion/src/api/routes/notificationRoutes");
 
+// === CONFIGURACIÓN ===
 const PORT = process.env.PORT || 3001;
 const app = express();
 const server = http.createServer(app);
@@ -27,6 +30,7 @@ app.use(cors({
   origin: allowedOrigins,
   credentials: true,
 }));
+
 app.use(express.json());
 
 // === SOCKET.IO ===
@@ -40,12 +44,12 @@ const io = new Server(server, {
 
 app.set("io", io);
 
-// Ruta base
+// === RUTA DE PRUEBA ===
 app.get("/", (req, res) => {
-  res.send("API funcionando correctamente en localhost 3001");
+  res.send("✅ API funcionando correctamente en el puerto " + PORT);
 });
 
-// Rutas
+// === USO DE RUTAS ===
 app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/pets", petRoutes);
@@ -53,7 +57,7 @@ app.use("/api/adoption", adoptionRoutes);
 app.use("/api/follow", followUpRoutes);
 app.use("/api/notificaciones", notificationRoutes);
 
-// SOCKET.IO events
+// === EVENTOS DE SOCKET.IO ===
 io.on("connection", (socket) => {
   console.log("🟢 Socket conectado:", socket.id);
 
@@ -66,7 +70,7 @@ io.on("connection", (socket) => {
 
   socket.on("admin_join", () => {
     socket.join("admins");
-    console.log(`👮 Admin/Empleado unido al canal de difusión general`);
+    console.log("👮 Admin/Empleado unido al canal de difusión general");
   });
 
   socket.on("disconnect", () => {
@@ -74,10 +78,15 @@ io.on("connection", (socket) => {
   });
 });
 
-// INICIO
-sequelize.sync({ alter: true }).then(() => {
-  server.listen(PORT, () => {
-    console.log(`🚀 Servidor escuchando en el puerto ${PORT}`);
+// === INICIO DEL SERVIDOR ===
+sequelize.sync({ alter: true })
+  .then(() => {
+    server.listen(PORT, () => {
+      console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+    });
+  })
+  .catch((error) => {
+    console.error("❌ Error al conectar con la base de datos:", error);
   });
-});
+
 
