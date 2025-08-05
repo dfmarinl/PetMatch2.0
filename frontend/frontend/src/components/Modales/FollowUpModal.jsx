@@ -118,6 +118,14 @@ const FollowUpModal = ({
             </div>
           </div>
 
+          {/* Consejo para las imágenes */}
+          <div className="mb-4 p-3 bg-blue-50 border-l-4 border-blue-400 rounded-r-md">
+            <p className="text-sm text-blue-700">
+              <span className="font-medium">Consejo:</span> Haz clic en
+              cualquier imagen de la tabla para verla en tamaño completo.
+            </p>
+          </div>
+
           {loading ? (
             <div className="text-center py-8">
               <p>Cargando seguimientos...</p>
@@ -127,28 +135,46 @@ const FollowUpModal = ({
               <table className="w-full text-sm text-left border border-gray-300 rounded min-w-[1200px]">
                 <thead className="bg-gray-100 sticky top-0">
                   <tr>
-                    <th className="px-4 py-3 min-w-[100px]">Fecha</th>
-                    <th className="px-4 py-3 min-w-[90px]">Salud</th>
-                    <th className="px-4 py-3 min-w-[90px]">Nutrición</th>
-                    <th className="px-4 py-3 min-w-[100px]">
+                    <th className="px-4 py-3 min-w-[100px] text-center">
+                      Fecha
+                    </th>
+                    <th className="px-4 py-3 min-w-[90px] text-center">
+                      Salud
+                    </th>
+                    <th className="px-4 py-3 min-w-[90px] text-center">
+                      Nutrición
+                    </th>
+                    <th className="px-4 py-3 min-w-[100px] text-center">
                       Vínculo
                       <br />
                       afectivo
                     </th>
-                    <th className="px-4 py-3 min-w-[120px]">
+                    <th className="px-4 py-3 min-w-[120px] text-center">
                       Convive
                       <br />
                       pacíficamente
                       <br />
                       con otras mascotas
                     </th>
-                    <th className="px-4 py-3 min-w-[200px]">Comentarios</th>
-                    <th className="px-4 py-3 min-w-[100px]">Imagen</th>
-                    <th className="px-4 py-3 min-w-[120px]">
-                      Estado del reporte de seguimiento
+                    <th className="px-4 py-3 min-w-[200px] text-center">
+                      Comentarios
                     </th>
-                    <th className="px-4 py-3 min-w-[80px]">
-                      ¿El reporte fue satisfactorio?
+                    <th className="px-4 py-3 min-w-[100px] text-center">
+                      Imagen
+                    </th>
+                    <th className="px-4 py-3 min-w-[120px] text-center">
+                      Estado del
+                      <br />
+                      reporte de
+                      <br />
+                      seguimiento
+                    </th>
+                    <th className="px-4 py-3 min-w-[80px] text-center">
+                      ¿El reporte
+                      <br />
+                      fue
+                      <br />
+                      satisfactorio?
                     </th>
                   </tr>
                 </thead>
