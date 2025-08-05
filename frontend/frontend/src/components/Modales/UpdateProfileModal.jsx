@@ -106,11 +106,12 @@ const UpdateProfileModal = ({ isOpen, onClose, user, onSave }) => {
               type="text"
               name="identificationNumber"
               inputMode="numeric"
-              pattern="[0-9]*"
+              pattern="\d{6,10}"
+              maxLength={10}
               value={formData.identificationNumber}
               onChange={(e) => {
                 const value = e.target.value;
-                if (/^\d*$/.test(value)) {
+                if (/^\d{0,10}$/.test(value)) {
                   setFormData((prev) => ({
                     ...prev,
                     identificationNumber: value,
@@ -130,6 +131,8 @@ const UpdateProfileModal = ({ isOpen, onClose, user, onSave }) => {
               <input
                 type="number"
                 name="age"
+                min="18"
+                max="80"
                 value={formData.age}
                 onChange={handleChange}
                 required

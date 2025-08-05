@@ -59,6 +59,11 @@ const UserModal = ({ isOpen, onClose, onSubmit, user }) => {
       return;
     }
 
+    if (!/^\d{6,10}$/.test(formData.identificationNumber)) {
+    alert("El número de identificación debe tener entre 6 y 10 dígitos numéricos.");
+    return;
+    }
+
     const dataToSend = { ...formData };
     if (isEditMode) {
       delete dataToSend.password;
@@ -121,11 +126,23 @@ const UserModal = ({ isOpen, onClose, onSubmit, user }) => {
               <input
                 type="text"
                 name="identificationNumber"
+                inputMode="numeric"
+                pattern="\d{6,10}"
+                maxLength={10}
                 value={formData.identificationNumber}
-                onChange={handleChange}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (/^\d{0,10}$/.test(value)) {
+                    setFormData((prev) => ({
+                      ...prev,
+                      identificationNumber: value,
+                    }));
+                  }
+                }}
                 required
                 className="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2"
               />
+
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -136,6 +153,8 @@ const UserModal = ({ isOpen, onClose, onSubmit, user }) => {
                 <input
                   type="number"
                   name="age"
+                  min="18"
+                  max="80"
                   value={formData.age}
                   onChange={handleChange}
                   required

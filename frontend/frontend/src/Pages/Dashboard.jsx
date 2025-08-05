@@ -330,6 +330,7 @@ useEffect(() => {
         onClose={closeAdoptionModal}
         pet={petToAdopt}
         user={user}
+        navigate={navigate}
       />
 
       {/* Footer */}

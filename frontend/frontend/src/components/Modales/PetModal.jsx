@@ -215,6 +215,8 @@ const PetModal = ({ isOpen, onClose, pet, loading = false }) => {
             <input
               type="number"
               name="age"
+              min="0"
+              max="20"
               value={formData.age}
               onChange={handleChange}
               className={`w-full px-3 py-2 border rounded-lg ${
