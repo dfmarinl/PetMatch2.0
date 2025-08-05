@@ -1,5 +1,7 @@
 import React, { useState } from "react";
-import { XCircle } from "lucide-react";
+import { XCircle, Check, X } from "lucide-react";
+import { setFollowUpSuccessRequest } from "../../api/followUp";
+import toast from "react-hot-toast";
 
 const FollowUpModal = ({
   isOpen,
@@ -9,6 +11,13 @@ const FollowUpModal = ({
   loading = false,
 }) => {
   const [selectedImage, setSelectedImage] = useState(null);
+  const [updatingFollowUp, setUpdatingFollowUp] = useState(null);
+  const [followUpsState, setFollowUpsState] = useState(followUps);
+
+  // Actualizar el estado local cuando cambien los followUps del prop
+  React.useEffect(() => {
+    setFollowUpsState(followUps);
+  }, [followUps]);
 
   if (!isOpen) return null;
 
@@ -25,11 +34,58 @@ const FollowUpModal = ({
     return value ? "Sí" : "No";
   };
 
+  const renderSuccessStatus = (isSuccessful) => {
+    if (isSuccessful === null) {
+      return (
+        <span className="px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700">
+          En revisión
+        </span>
+      );
+    }
+    return (
+      <span
+        className={`px-2 py-1 rounded-full text-xs font-medium ${
+          isSuccessful
+            ? "bg-green-100 text-green-700"
+            : "bg-red-100 text-red-700"
+        }`}
+      >
+        {isSuccessful ? "Satisfactorio" : "No satisfactorio"}
+      </span>
+    );
+  };
+
+  const handleUpdateSuccess = async (followUpId, isSuccessful) => {
+    setUpdatingFollowUp(followUpId);
+
+    try {
+      await setFollowUpSuccessRequest(followUpId, isSuccessful);
+
+      // Actualizar el estado local
+      setFollowUpsState((prevFollowUps) =>
+        prevFollowUps.map((followUp) =>
+          followUp.id === followUpId ? { ...followUp, isSuccessful } : followUp
+        )
+      );
+
+      toast.success(
+        `Seguimiento marcado como ${
+          isSuccessful ? "satisfactorio" : "no satisfactorio"
+        }`
+      );
+    } catch (error) {
+      console.error("Error al actualizar el estado del seguimiento:", error);
+      toast.error("Error al actualizar el estado del seguimiento");
+    } finally {
+      setUpdatingFollowUp(null);
+    }
+  };
+
   return (
     <>
       {/* Fondo con blur */}
       <div className="fixed inset-0 z-50 backdrop-blur-sm bg-white/30 flex justify-center items-center">
-        <div className="bg-white rounded-lg p-6 max-w-7xl w-full shadow-lg relative overflow-auto max-h-[85vh]">
+        <div className="bg-white rounded-lg p-6 max-w-[90vw] w-full shadow-lg relative overflow-auto max-h-[85vh]">
           <button
             onClick={onClose}
             className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 z-10"
@@ -68,34 +124,46 @@ const FollowUpModal = ({
             </div>
           ) : (
             <div className="overflow-x-auto overflow-y-auto max-h-[50vh]">
-              <table className="w-full text-sm text-left border border-gray-300 rounded min-w-[1000px]">
+              <table className="w-full text-sm text-left border border-gray-300 rounded min-w-[1200px]">
                 <thead className="bg-gray-100 sticky top-0">
                   <tr>
                     <th className="px-4 py-3 min-w-[100px]">Fecha</th>
                     <th className="px-4 py-3 min-w-[90px]">Salud</th>
                     <th className="px-4 py-3 min-w-[90px]">Nutrición</th>
+                    <th className="px-4 py-3 min-w-[100px]">
+                      Vínculo
+                      <br />
+                      afectivo
+                    </th>
                     <th className="px-4 py-3 min-w-[120px]">
-                      Vínculo afectivo
+                      Convive
+                      <br />
+                      pacíficamente
+                      <br />
+                      con otras mascotas
                     </th>
-                    <th className="px-4 py-3 min-w-[150px]">
-                      Convive pacíficamente con otras mascotas
-                    </th>
-                    <th className="px-4 py-3 min-w-[250px]">Comentarios</th>
+                    <th className="px-4 py-3 min-w-[200px]">Comentarios</th>
                     <th className="px-4 py-3 min-w-[100px]">Imagen</th>
+                    <th className="px-4 py-3 min-w-[120px]">
+                      Estado del reporte de seguimiento
+                    </th>
+                    <th className="px-4 py-3 min-w-[80px]">
+                      ¿El reporte fue satisfactorio?
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {followUps.length === 0 ? (
+                  {followUpsState.length === 0 ? (
                     <tr>
                       <td
-                        colSpan="7"
+                        colSpan="9"
                         className="px-4 py-8 text-center text-gray-500"
                       >
                         No hay seguimientos registrados aún.
                       </td>
                     </tr>
                   ) : (
-                    followUps
+                    followUpsState
                       .sort(
                         (a, b) => new Date(b.visitDate) - new Date(a.visitDate)
                       )
@@ -181,6 +249,35 @@ const FollowUpModal = ({
                                 </span>
                               </div>
                             )}
+                          </td>
+                          <td className="px-4 py-3 align-top">
+                            {renderSuccessStatus(item.isSuccessful)}
+                          </td>
+                          <td className="px-4 py-3 align-top">
+                            <div className="flex flex-col gap-1">
+                              <button
+                                onClick={() =>
+                                  handleUpdateSuccess(item.id, true)
+                                }
+                                disabled={updatingFollowUp === item.id}
+                                className="flex items-center justify-center px-2 py-1 bg-green-500 text-white rounded text-xs hover:bg-green-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                                title="Marcar como satisfactorio"
+                              >
+                                <Check size={12} />
+                                <span className="ml-1">Sí</span>
+                              </button>
+                              <button
+                                onClick={() =>
+                                  handleUpdateSuccess(item.id, false)
+                                }
+                                disabled={updatingFollowUp === item.id}
+                                className="flex items-center justify-center px-2 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                                title="Marcar como no satisfactorio"
+                              >
+                                <X size={12} />
+                                <span className="ml-1">No</span>
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ))

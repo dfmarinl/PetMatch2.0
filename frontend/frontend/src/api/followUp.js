@@ -2,6 +2,7 @@ import axios from "axios";
 
 const API_BASE_URL = "http://localhost:3001/api/follow";
 
+//Crear un seguimiento para una mascota adoptada
 export const createFollowUp = async (followUpData) => {
   try {
     const token = localStorage.getItem("token");
@@ -30,6 +31,7 @@ export const createFollowUp = async (followUpData) => {
   }
 };
 
+//Obtener los seguimientos de una mascota según su id
 export const getFollowUpsByPetIdRequest = async (petId) => {
   try {
     const token = localStorage.getItem("token");
@@ -46,6 +48,28 @@ export const getFollowUpsByPetIdRequest = async (petId) => {
     return response.data;
   } catch (error) {
     console.error("Error al obtener seguimientos por mascota:", error);
+    throw error;
+  }
+};
+
+//Establecer si la el seguimiento fue satisfactorio o no
+export const setFollowUpSuccessRequest = async (followUpId, isSuccessful) => {
+  try {
+    const token = localStorage.getItem("token");
+
+    const response = await axios.patch(
+      `${API_BASE_URL}/followups/${followUpId}/success`,
+      { isSuccessful }, // cuerpo de la petición
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Error al actualizar isSuccessful del seguimiento:", error);
     throw error;
   }
 };
