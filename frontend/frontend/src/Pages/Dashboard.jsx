@@ -40,7 +40,7 @@ const Dashboard = () => {
 useEffect(() => {
   if (!user?.id) return;
 
-  socket.current = io("http://localhost:3001");
+  socket.current = io("https://petmatch2-0.onrender.com/");
 
   socket.current.emit("join", user.id);
 

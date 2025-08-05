@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:3001/api/adoption';
+const BASE_URL = 'https://petmatch2-0.onrender.com/api/adoption';
 
 export const getAllRequests = async () => {
   const token = localStorage.getItem('token');
@@ -46,7 +46,7 @@ export const getCompletedAdoptions = async () => {
   const token = localStorage.getItem('token');
 
   try {
-    const res = await axios.get('http://localhost:3001/api/adoption/completedAdoptions', {
+    const res = await axios.get('https://petmatch2-0.onrender.com/api/adoption/completedAdoptions', {
       headers: {
         Authorization: `Bearer ${token}`,
       },

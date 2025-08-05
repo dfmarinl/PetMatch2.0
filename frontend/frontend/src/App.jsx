@@ -28,7 +28,7 @@ export const useAuth = () => {
 };
 
 // URL del backend
-const SOCKET_URL = "http://localhost:3001"; // ajusta si tu backend está en otro puerto/URL
+const SOCKET_URL = "https://petmatch2-0.onrender.com/"; // ajusta si tu backend está en otro puerto/URL
 
 function App() {
   const [user, setUser] = useState(null);

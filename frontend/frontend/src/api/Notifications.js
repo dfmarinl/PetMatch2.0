@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:3001/api/notificaciones";
+const API_BASE_URL = "https://petmatch2-0.onrender.com/api/notificaciones";
 
 // Obtener todas las notificaciones de un usuario
 export const getNotificationsByUserId = async (userId) => {
@@ -58,7 +58,7 @@ export const getNotificationsByRole = async (role) => {
   try {
     const token = localStorage.getItem("token");
     const response = await axios.get(
-      `http://localhost:3001/api/notificaciones/role/${role}`,
+      `https://petmatch2-0.onrender.com/api/notificaciones/role/${role}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,

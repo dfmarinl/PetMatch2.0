@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:3001/api/follow";
+const API_BASE_URL = "https://petmatch2-0.onrender.com/api/follow";
 
 //Crear un seguimiento para una mascota adoptada
 export const createFollowUp = async (followUpData) => {

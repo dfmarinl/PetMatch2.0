@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:3001/api/users'; // Ajusta si tu backend tiene otro dominio o puerto
+const API_BASE_URL = 'https://petmatch2-0.onrender.com/api/users'; // Ajusta si tu backend tiene otro dominio o puerto
 
 // Utilidad para agregar el token a las cabeceras
 const getAuthHeaders = () => {

@@ -1,7 +1,7 @@
 // api/pet.js
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:3001/api/pets'; // Ajusta si tu backend usa un prefijo distinto
+const API_BASE_URL = 'https://petmatch2-0.onrender.com/api/pets'; // Ajusta si tu backend usa un prefijo distinto
 
 export const getAllPets = async () => {
   try {
@@ -60,7 +60,7 @@ export const deletePetById = async (petId) => {
 export const updatePet = async (petId, updatedData) => {
   try {
     const token = localStorage.getItem('token');
-    const response = await axios.put(`http://localhost:3001/api/pets/${petId}`, updatedData, {
+    const response = await axios.put(`https://petmatch2-0.onrender.com/api/pets/${petId}`, updatedData, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
