@@ -13,7 +13,7 @@ export const createFollowUp = async (followUpData) => {
       petIsHealthy: followUpData.petIsHealthy,
       hasProperNutrition: followUpData.hasProperNutrition,
       showsAffectionBond: followUpData.showsAffectionBond,
-      otherPetsAreFriendly: followUpData.otherPetsAreFriendly || null,
+      otherPetsAreFriendly: followUpData.otherPetsAreFriendly ?? null,
       comments: followUpData.comments || "",
       image: followUpData.image || "", // link a imagen (opcional)
     };
@@ -44,7 +44,7 @@ export const getFollowUpsByPetIdRequest = async (petId) => {
         },
       }
     );
-
+    console.log(response.data);
     return response.data;
   } catch (error) {
     console.error("Error al obtener seguimientos por mascota:", error);
