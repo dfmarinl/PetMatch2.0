@@ -11,8 +11,8 @@ import Dashboard from "./Pages/Dashboard";
 import AdminDashboard from "./Pages/AdminDashboard";
 import PetRegistration from "./Pages/PetRegistration";
 import PetsCatalog from "./Pages/PetsCatalog";
-import ClientProfile from "./pages/ClientProfile";
-import StaffProfile from "./pages/StaffProfile";
+import ClientProfile from "./Pages/ClientProfile";
+import StaffProfile from "./Pages/StaffProfile";
 import ResetPasswordPage from "./Pages/ResetPasswordPage";
 
 
