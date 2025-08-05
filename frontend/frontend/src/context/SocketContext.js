@@ -15,7 +15,7 @@ export const SocketProvider = ({ children, user }) => {
 
   useEffect(() => {
     if (user?.id) {
-      const newSocket = io("http://localhost:3001", {
+      const newSocket = io("https://petmatch2-0.onrender.com/", {
         query: { userId: user.id }, // Enviamos ID al conectar
       });
 
