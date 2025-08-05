@@ -5,20 +5,11 @@ import { uploadPetImage } from "../api/petImage";
 import UpdateProfileModal from "../components/Modales/UpdateProfileModal";
 import UpdatePasswordModal from "../components/Modales/UpdatePasswordModal";
 import AdoptionFollowUpModal from "../components/Modales/AdoptioFollowUpModal";
+import { translateAdoptionStatus } from "../utils/translateStatus";
 import { User, Settings, Lock, FileText, PawPrint, LogOut } from "lucide-react";
 import { useAuth } from "../App";
 import { useNavigate } from "react-router-dom";
 import NotificationBell from "../components/NotificationBell";
-
-const translateAdoptionStatus = (status) => {
-  const translations = {
-    pending: "Pendiente",
-    approved: "Aprobada",
-    rejected: "Rechazada",
-    suspended: "Suspendida",
-  };
-  return translations[status] || status;
-};
 
 const ClientProfile = () => {
   const [userData, setUserData] = useState(null);
