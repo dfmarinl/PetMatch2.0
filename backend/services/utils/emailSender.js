@@ -115,6 +115,35 @@ const emailTemplates = {
   `,
 }),
 
+followUpSuccess: ({ userName, petName, isSuccessful, followUpLink }) => ({
+  subject: isSuccessful
+    ? `🎉 ¡Seguimiento exitoso para ${petName}!`
+    : `⚠️ Seguimiento no exitoso para ${petName}`,
+  html: `
+    <div style="font-family: Arial, sans-serif; padding: 20px;">
+      <h2>Hola ${userName},</h2>
+      <p>
+        El resultado del seguimiento post-adopción para tu mascota <strong>${petName}</strong> ha sido marcado como 
+        <strong style="color: ${isSuccessful ? "green" : "red"};">
+          ${isSuccessful ? "exitoso" : "no exitoso"}
+        </strong>.
+      </p>
+      ${
+        isSuccessful
+          ? `<p>¡Felicitaciones! Esto indica que tu mascota está en buenas condiciones y se nota el vínculo afectivo. 🎉</p>`
+          : `<p>Recomendamos revisar el informe para ver posibles mejoras en el cuidado de tu mascota.</p>`
+      }
+      <p>Puedes ver el seguimiento completo en el siguiente enlace:</p>
+      <a href="${followUpLink}" style="display: inline-block; padding: 10px 20px; background-color: ${
+    isSuccessful ? "#28a745" : "#dc3545"
+  }; color: white; text-decoration: none; border-radius: 5px; margin-top: 10px;">
+        Ver seguimiento
+      </a>
+      <br/>
+      <p style="margin-top: 20px;">Gracias por ser parte de PetMatch 🐾</p>
+    </div>
+  `,
+}),
 
   
 

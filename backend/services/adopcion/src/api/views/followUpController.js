@@ -250,13 +250,61 @@ const setFollowUpSuccess = async (req, res) => {
       });
     }
 
-    const followUp = await AdoptionFollowUp.findByPk(id);
+    const followUp = await AdoptionFollowUp.findByPk(id, {
+      include: {
+        model: CompletedAdoption,
+        include: {
+          model: AdoptionRequest,
+          include: [User, Pet],
+        },
+      },
+    });
+
     if (!followUp) {
       return res.status(404).json({ message: "Seguimiento no encontrado." });
     }
 
     followUp.isSuccessful = isSuccessful;
     await followUp.save();
+
+    const adoption = followUp.CompletedAdoption;
+    const request = adoption?.AdoptionRequest;
+    const user = request?.User;
+    const pet = request?.Pet;
+
+    if (!user || !pet) {
+      return res.status(500).json({
+        message: "No se pudieron obtener datos del adoptante o mascota.",
+      });
+    }
+
+    const petName = pet.name;
+    const userName = `${user.firstName} ${user.lastName}`;
+    const message = isSuccessful
+      ? `El seguimiento de ${petName} fue marcado como exitoso. ¡Gracias por cuidar tan bien de tu mascota!`
+      : `El seguimiento de ${petName} fue marcado como no exitoso. Te recomendamos revisar el informe.`;
+
+    // Crear notificación
+    const notification = await Notification.create({
+      userId: user.id,
+      rol: "cliente",
+      message,
+      type: "estadoSeguimiento",
+    });
+
+    // Enviar correo
+    await sendEmail("followUpSuccess", user.email, {
+      userName,
+      petName,
+      isSuccessful,
+      followUpLink: `http://localhost:3000/seguimientos`,
+    });
+
+    // Emitir por socket al cliente
+    const io = req.app.get("io");
+    io.to(user.id.toString()).emit("nuevaNotificacion", {
+      notification,
+    });
 
     res.status(200).json({
       message: "Estado de éxito actualizado correctamente.",
@@ -269,6 +317,7 @@ const setFollowUpSuccess = async (req, res) => {
     });
   }
 };
+
 
 module.exports = {
   createFollowUp,
