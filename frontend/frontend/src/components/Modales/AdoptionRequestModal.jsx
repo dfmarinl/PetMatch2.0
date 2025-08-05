@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { X } from "lucide-react";
 import { createAdoptionRequest } from "../../api/requests";
+import toast from "react-hot-toast";
 
-const AdoptionRequestModal = ({ isOpen, onClose, pet }) => {
+
+const AdoptionRequestModal = ({ isOpen, onClose, pet ,navigate  }) => {
   const [form, setForm] = useState({
     reasonForAdoption: "",
     hadPetsBefore: false,
@@ -48,10 +50,13 @@ const AdoptionRequestModal = ({ isOpen, onClose, pet }) => {
         residenceType: "",
         otherPetsAtHome: false,
       });
+      toast.success("¡Solicitud enviada con éxito!");
+      onClose();
       setTimeout(() => {
-        setMessage("");
-        onClose();
+      navigate(0); // recarga la página después de mostrar el toast
       }, 1500);
+      
+
     } catch (error) {
       setMessage("Error al enviar la solicitud.");
       console.error(error);
@@ -86,8 +91,9 @@ const AdoptionRequestModal = ({ isOpen, onClose, pet }) => {
           <input
             type="number"
             name="dailyTimeForPet"
-            step="0.1"
+            step="1"
             min="0"
+            max="15"
             placeholder="¿Cuántas horas al día dedicarías a la mascota?"
             value={form.dailyTimeForPet}
             onChange={handleChange}

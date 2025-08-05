@@ -25,7 +25,12 @@ const RegisterForm = ({ onSubmit, loading = false }) => {
 
     if (!formData.firstName.trim()) newErrors.firstName = 'El nombre es requerido';
     if (!formData.lastName.trim()) newErrors.lastName = 'El apellido es requerido';
-    if (!formData.identificationNumber.trim()) newErrors.identificationNumber = 'La identificación es requerida';
+    if (!formData.identificationNumber.trim()) {
+      newErrors.identificationNumber = 'La identificación es requerida';
+    } else if (!/^\d{6,10}$/.test(formData.identificationNumber)) {
+      newErrors.identificationNumber = 'Debe tener entre 6 y 10 dígitos numéricos';
+    }
+
 
     if (!formData.age || isNaN(formData.age)) {
       newErrors.age = 'La edad es requerida y debe ser un número';
@@ -111,12 +116,18 @@ const RegisterForm = ({ onSubmit, loading = false }) => {
         placeholder="123456789"
         icon={IdCard}
         error={errors.identificationNumber}
+        pattern="\d{6,10}"
+        inputMode="numeric"
+        maxLength={10}
       />
+
 
       <Input
         label="Edad"
         type="number"
         name="age"
+        min="18"
+        max="80"
         value={formData.age}
         onChange={handleChange}
         placeholder="30"
