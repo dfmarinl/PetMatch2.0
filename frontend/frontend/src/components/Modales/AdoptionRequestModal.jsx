@@ -4,7 +4,7 @@ import { createAdoptionRequest } from "../../api/requests";
 import toast from "react-hot-toast";
 
 
-const AdoptionRequestModal = ({ isOpen, onClose, pet ,navigate  }) => {
+const AdoptionRequestModal = ({ isOpen, onClose, pet  }) => {
   const [form, setForm] = useState({
     reasonForAdoption: "",
     hadPetsBefore: false,
@@ -52,9 +52,7 @@ const AdoptionRequestModal = ({ isOpen, onClose, pet ,navigate  }) => {
       });
       toast.success("¡Solicitud enviada con éxito!");
       onClose();
-      setTimeout(() => {
-      navigate(0); // recarga la página después de mostrar el toast
-      }, 1500);
+      
       
 
     } catch (error) {
