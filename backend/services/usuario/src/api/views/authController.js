@@ -318,7 +318,7 @@ const forgotPassword = async (req, res) => {
       { expiresIn: "15m" }
     );
 
-    const resetLink = `https://petmatch2-0.onrender.com/reset-password?token=${resetToken}`;
+    const resetLink = `https://pet-match2-0.vercel.app/reset-password?token=${resetToken}`;
 
     // Transportador configurado (Gmail + tolerancia a certificados autofirmados)
     const transporter = nodemailer.createTransport({
