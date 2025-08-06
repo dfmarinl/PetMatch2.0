@@ -207,7 +207,7 @@ socketRef.current.on("connect", () => {
     fetchAdoptionRequests();
 
     setTimeout(() => {
-      navigate(0);
+      navigate("/", { replace: true });
     }, 3000);
   });
 
