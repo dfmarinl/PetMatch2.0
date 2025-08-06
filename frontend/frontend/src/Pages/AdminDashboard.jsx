@@ -310,9 +310,10 @@ socketRef.current.on("connect", () => {
   if (!user) return <div className="p-4">Cargando usuario...</div>;
 
   return (
-    <div className="min-h-screen bg-[#f8f9fa]">
-      <Header user={user} onLogout={logout} />
+  <div className="flex flex-col min-h-screen bg-[#f8f9fa]">
+    <Header user={user} onLogout={logout} />
 
+    <div className="flex-1">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <NavigationTabs
           activeTab={activeTab}
@@ -348,6 +349,7 @@ socketRef.current.on("connect", () => {
             setShowFilters={setShowFilters}
           />
         )}
+
         {activeTab === "adoptions" && (
           <AdoptionsTab
             adoptions={completedAdoptions}
@@ -383,62 +385,62 @@ socketRef.current.on("connect", () => {
           />
         )}
       </div>
-
-      {/* Modals */}
-      <PetModal
-        isOpen={showPetModal}
-        onClose={() => setShowPetModal(false)}
-        onSubmit={handlePetSubmit}
-        pet={selectedPet}
-        loading={apiLoading}
-      />
-      <PetDetailsModal
-        isOpen={showDetailsModal}
-        onClose={() => setShowDetailsModal(false)}
-        pet={selectedPet}
-      />
-      <DeleteConfirmModal
-        isOpen={showDeleteModal}
-        onClose={() => setShowDeleteModal(false)}
-        petId={selectedPet?.id}
-        petName={selectedPet?.name || ""}
-        onDeleted={handleConfirmDelete}
-      />
-
-      <UserModal
-        isOpen={showUserModal}
-        onClose={() => setShowUserModal(false)}
-        onSubmit={handleUserSubmit}
-        user={selectedUser}
-      />
-      <UserDetailsModal
-        isOpen={showUserDetailsModal}
-        onClose={() => setShowUserDetailsModal(false)}
-        user={selectedUser}
-      />
-      <DeleteUserConfirmModal
-        isOpen={showDeleteUserModal}
-        onClose={() => setShowDeleteUserModal(false)}
-        userName={`${selectedUser?.firstName} ${selectedUser?.lastName}`}
-        onConfirm={handleConfirmDeleteUser}
-      />
-
-      <FollowUpModal
-        isOpen={showFollowUpModal}
-        onClose={() => setShowFollowUpModal(false)}
-        pet={followUpPet}
-        followUps={followUpsData}
-      />
-
-      {/* Footer */}
-      <footer className="bg-[#1f2937] text-gray-300 py-4 mt-auto">
-        <div className="max-w-7xl mx-auto px-4 text-center text-sm text-gray-300">
-          © 2025 PetMatch. Todos los derechos reservados. Desarrollado por el
-          equipo de PetMatch.
-        </div>
-      </footer>
     </div>
-  );
+
+    {/* Modals */}
+    <PetModal
+      isOpen={showPetModal}
+      onClose={() => setShowPetModal(false)}
+      onSubmit={handlePetSubmit}
+      pet={selectedPet}
+      loading={apiLoading}
+    />
+    <PetDetailsModal
+      isOpen={showDetailsModal}
+      onClose={() => setShowDetailsModal(false)}
+      pet={selectedPet}
+    />
+    <DeleteConfirmModal
+      isOpen={showDeleteModal}
+      onClose={() => setShowDeleteModal(false)}
+      petId={selectedPet?.id}
+      petName={selectedPet?.name || ""}
+      onDeleted={handleConfirmDelete}
+    />
+
+    <UserModal
+      isOpen={showUserModal}
+      onClose={() => setShowUserModal(false)}
+      onSubmit={handleUserSubmit}
+      user={selectedUser}
+    />
+    <UserDetailsModal
+      isOpen={showUserDetailsModal}
+      onClose={() => setShowUserDetailsModal(false)}
+      user={selectedUser}
+    />
+    <DeleteUserConfirmModal
+      isOpen={showDeleteUserModal}
+      onClose={() => setShowDeleteUserModal(false)}
+      userName={`${selectedUser?.firstName} ${selectedUser?.lastName}`}
+      onConfirm={handleConfirmDeleteUser}
+    />
+
+    <FollowUpModal
+      isOpen={showFollowUpModal}
+      onClose={() => setShowFollowUpModal(false)}
+      pet={followUpPet}
+      followUps={followUpsData}
+    />
+
+    {/* Footer */}
+    <footer className="bg-[#1f2937] text-gray-300 py-4">
+      <div className="max-w-7xl mx-auto px-4 text-center text-sm text-gray-300">
+        © 2025 PetMatch. Todos los derechos reservados. Desarrollado por el equipo de PetMatch.
+      </div>
+    </footer>
+  </div>
+);
 };
 
 export default AdminDashboard;
