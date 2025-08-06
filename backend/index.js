@@ -22,7 +22,7 @@ const server = http.createServer(app);
 
 // === CORS ===
 const allowedOrigins = [
-  "http://localhost:5173",
+
   "https://pet-match2-0.vercel.app"
 ];
 
