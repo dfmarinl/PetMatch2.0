@@ -1,5 +1,3 @@
-// index.js
-
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
@@ -15,49 +13,31 @@ const adoptionRoutes = require("./services/adopcion/src/api/routes/adoptionRoute
 const followUpRoutes = require("./services/adopcion/src/api/routes/followUpRoutes");
 const notificationRoutes = require("./services/notificacion/src/api/routes/notificationRoutes");
 
-// Configuración
 const PORT = process.env.PORT || 3001;
 const app = express();
 const server = http.createServer(app);
 
-// === CORS ===
-const allowedOrigins = [
-
-  "https://pet-match2-0.vercel.app"
-];
-
-app.use(cors({
-  origin: function (origin, callback) {
-    // Permitir solicitudes sin origen (como curl o Postman)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    } else {
-      return callback(new Error("No permitido por CORS"));
-    }
-  },
-  credentials: true,
-}));
-app.use(express.json());
-
-// === SOCKET.IO ===
+// Socket.IO con CORS
 const io = new Server(server, {
   cors: {
-    origin: allowedOrigins,
+    origin: "https://pet-match2-0.vercel.app", // URL del frontend
     methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
   },
 });
 
-// Compartir io en la app
+// Guardar instancia de io para los controladores
 app.set("io", io);
 
-// Ruta raíz
+// Middlewares
+app.use(cors());
+app.use(express.json());
+
+// Ruta básica
 app.get("/", (req, res) => {
-  res.send("✅ API funcionando correctamente en puerto " + PORT);
+  res.send("API funcionando correctamente en localhost 3001");
 });
 
-// Usar rutas
+// Rutas de API
 app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/pets", petRoutes);
@@ -65,30 +45,33 @@ app.use("/api/adoption", adoptionRoutes);
 app.use("/api/follow", followUpRoutes);
 app.use("/api/notificaciones", notificationRoutes);
 
-// Eventos de socket
+// === SOCKET.IO ===
 io.on("connection", (socket) => {
-  console.log("🟢 Nuevo socket conectado:", socket.id);
+  console.log("🟢 Socket conectado:", socket.id);
 
+  // 🧩 Unión opcional a sala privada si es cliente
   socket.on("join", (userId) => {
     if (userId) {
       socket.join(userId.toString());
-      console.log(`📥 Usuario ${userId} unido a su sala privada`);
+      console.log(`👤 Cliente con ID ${userId} unido a su sala privada`);
     }
   });
 
+  // 🧩 Unión opcional a canal de broadcast para admins/empleados
   socket.on("admin_join", () => {
     socket.join("admins");
-    console.log("👮 Admin unido al canal general de admins");
+    console.log(`👮 Admin/Empleado unido al canal de difusión general`);
   });
 
+  // 🔴 Desconexión
   socket.on("disconnect", () => {
     console.log("🔴 Socket desconectado:", socket.id);
   });
 });
 
-// Inicializar servidor
+// === INICIAR SERVIDOR ===
 sequelize.sync({ alter: true }).then(() => {
   server.listen(PORT, () => {
-    console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+    console.log(`🚀 Servidor escuchando en el puerto ${PORT}`);
   });
 });
