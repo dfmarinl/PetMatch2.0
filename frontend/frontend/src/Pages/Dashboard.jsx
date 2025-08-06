@@ -67,7 +67,7 @@ useEffect(() => {
 
     console.log("📨 Notificación recibida:", notification);
      setTimeout(() => {
-        navigate(0);
+        navigate("/dashboard");
       }, 3000);
 
   });
