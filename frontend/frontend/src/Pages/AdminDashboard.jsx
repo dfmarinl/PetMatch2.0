@@ -206,9 +206,7 @@ socketRef.current.on("connect", () => {
     ));
     fetchAdoptionRequests();
 
-    setTimeout(() => {
-      navigate("/", { replace: true });
-    }, 3000);
+    
   });
 
   // 🆕 Evento: nuevo seguimiento post-adopción

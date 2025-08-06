@@ -66,10 +66,7 @@ useEffect(() => {
     ));
 
     console.log("📨 Notificación recibida:", notification);
-     setTimeout(() => {
-        navigate("/", { replace: true });
-
-      }, 3000);
+    
 
   });
 
