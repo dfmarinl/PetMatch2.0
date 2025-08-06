@@ -161,185 +161,182 @@ useEffect(() => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8f9fa]">
-      {/* Header */}
-      <header className="bg-[#1f2937] shadow-sm">
-         
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <img
-                src="/dog.png"
-                alt="Logo"
-                className="w-6 h-6 object-contain"
-              />
-              <span className="ml-2 text-xl font-bold text-white">
-                PetMatch
+  <div className="flex flex-col min-h-screen bg-[#f8f9fa]">
+    {/* Header */}
+    <header className="bg-[#1f2937] shadow-sm">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          <div className="flex items-center">
+            <img
+              src="/dog.png"
+              alt="Logo"
+              className="w-6 h-6 object-contain"
+            />
+            <span className="ml-2 text-xl font-bold text-white">
+              PetMatch
+            </span>
+          </div>
+
+          <div className="flex items-center space-x-4">
+            <div className="ml-auto">
+              <NotificationBell />
+            </div>
+            <div
+              onClick={() => navigate("/profile")}
+              className="flex items-center space-x-2 cursor-pointer hover:opacity-80 transition-opacity"
+              title="Ir a Mi Perfil"
+            >
+              <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+                <User className="w-4 h-4 text-gray-700" />
+              </div>
+              <span className="text-sm font-medium text-white">
+                {user?.firstName || user?.email}
               </span>
             </div>
-            
-            
-
-            <div className="flex items-center space-x-4">
-              <div className="ml-auto">
-                <NotificationBell   />
-             </div>
-              <div
-                onClick={() => navigate("/profile")}
-                className="flex items-center space-x-2 cursor-pointer hover:opacity-80 transition-opacity"
-                title="Ir a Mi Perfil"
-              >
-                <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                  <User className="w-4 h-4 text-gray-700" />
-                </div>
-                <span className="text-sm font-medium text-white">
-                  {user?.firstName || user?.email}
-                </span>
-              </div>
-              <button
-                onClick={handleLogout}
-                className="p-2 text-gray-300 hover:text-red-400 transition-colors"
-                title="Cerrar sesión"
-              >
-                <LogOut size={20} />
-              </button>
-            </div>
+            <button
+              onClick={handleLogout}
+              className="p-2 text-gray-300 hover:text-red-400 transition-colors"
+              title="Cerrar sesión"
+            >
+              <LogOut size={20} />
+            </button>
           </div>
         </div>
-      </header>
+      </div>
+    </header>
 
-      {/* Main */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Filtros */}
-        <div className="mb-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <input
-            type="text"
-            placeholder="Buscar por nombre, raza o descripción"
-            className="px-4 py-2 border border-gray-300 rounded-lg"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+    {/* Main */}
+    <main className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Filtros */}
+      <div className="mb-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <input
+          type="text"
+          placeholder="Buscar por nombre, raza o descripción"
+          className="px-4 py-2 border border-gray-300 rounded-lg"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
 
-          <select
-            className="px-4 py-2 border border-gray-300 rounded-lg"
-            value={selectedSpecies}
-            onChange={(e) => setSelectedSpecies(e.target.value)}
+        <select
+          className="px-4 py-2 border border-gray-300 rounded-lg"
+          value={selectedSpecies}
+          onChange={(e) => setSelectedSpecies(e.target.value)}
+        >
+          <option value="">Todas las especies</option>
+          <option value="Perro">Perro</option>
+          <option value="Gato">Gato</option>
+        </select>
+
+        <select
+          className="px-4 py-2 border border-gray-300 rounded-lg"
+          value={selectedGender}
+          onChange={(e) => setSelectedGender(e.target.value)}
+        >
+          <option value="">Todos los géneros</option>
+          <option value="male">Macho</option>
+          <option value="female">Hembra</option>
+        </select>
+
+        <select
+          className="px-4 py-2 border border-gray-300 rounded-lg"
+          value={selectedAge}
+          onChange={(e) => setSelectedAge(e.target.value)}
+        >
+          <option value="">Todas las edades</option>
+          <option value="young">Joven (≤2 años)</option>
+          <option value="adult">Adulto (3-6 años)</option>
+          <option value="senior">Mayor (>6 años)</option>
+        </select>
+      </div>
+
+      <div className="mb-6">
+        <button
+          onClick={clearFilters}
+          className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300"
+        >
+          Limpiar Filtros
+        </button>
+      </div>
+
+      {/* Lista de mascotas */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredPets.map((pet) => (
+          <div
+            key={pet.id}
+            className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow"
           >
-            <option value="">Todas las especies</option>
-            <option value="Perro">Perro</option>
-            <option value="Gato">Gato</option>
-          </select>
-
-          <select
-            className="px-4 py-2 border border-gray-300 rounded-lg"
-            value={selectedGender}
-            onChange={(e) => setSelectedGender(e.target.value)}
-          >
-            <option value="">Todos los géneros</option>
-            <option value="male">Macho</option>
-            <option value="female">Hembra</option>
-          </select>
-
-          <select
-            className="px-4 py-2 border border-gray-300 rounded-lg"
-            value={selectedAge}
-            onChange={(e) => setSelectedAge(e.target.value)}
-          >
-            <option value="">Todas las edades</option>
-            <option value="young">Joven (≤2 años)</option>
-            <option value="adult">Adulto (3-6 años)</option>
-            <option value="senior">Mayor (>6 años)</option>
-          </select>
-        </div>
-
-        <div className="mb-6">
-          <button
-            onClick={clearFilters}
-            className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300"
-          >
-            Limpiar Filtros
-          </button>
-        </div>
-
-        {/* Lista de mascotas */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredPets.map((pet) => (
-            <div
-              key={pet.id}
-              className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow"
-            >
-              <img
-                src={pet.image}
-                alt={pet.name}
-                className="w-full h-48 object-cover"
-              />
-              <div className="p-6">
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="text-xl font-semibold text-gray-900">
-                    {pet.name}
-                  </h3>
-                  <span className="text-sm bg-primary-100 text-primary-700 px-2 py-1 rounded-full">
-                    {pet.species}
+            <img
+              src={pet.image}
+              alt={pet.name}
+              className="w-full h-48 object-cover"
+            />
+            <div className="p-6">
+              <div className="flex justify-between items-start mb-2">
+                <h3 className="text-xl font-semibold text-gray-900">
+                  {pet.name}
+                </h3>
+                <span className="text-sm bg-primary-100 text-primary-700 px-2 py-1 rounded-full">
+                  {pet.species}
+                </span>
+              </div>
+              <p className="text-gray-600 text-sm mb-2">
+                {pet.breed} • {pet.age + " años" || "Edad no disponible"}
+              </p>
+              <p className="text-gray-600 text-sm mb-4">{pet.description}</p>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <button
+                  onClick={() => openModal(pet)}
+                  className="flex-1 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-primary-600 transition-colors"
+                >
+                  Ver Detalles
+                </button>
+                {!pet.available ? (
+                  <span className="flex-1 text-center bg-red-100 text-red-600 py-2 px-4 rounded-lg cursor-not-allowed">
+                    Ya adoptado
                   </span>
-                </div>
-                <p className="text-gray-600 text-sm mb-2">
-                  {pet.breed} • {pet.age + " años" || "Edad no disponible"}
-                </p>
-                <p className="text-gray-600 text-sm mb-4">{pet.description}</p>
-                <div className="flex flex-col sm:flex-row gap-2">
+                ) : hasSentRequest(pet.id) ? (
+                  <span className="flex-1 text-center bg-yellow-100 text-yellow-600 py-2 px-4 rounded-lg cursor-not-allowed">
+                    Ya enviaste solicitud
+                  </span>
+                ) : (
                   <button
-                    onClick={() => openModal(pet)}
-                    className="flex-1 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-primary-600 transition-colors"
+                    onClick={() => openAdoptionModal(pet)}
+                    className="flex-1 bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition-colors"
                   >
-                    Ver Detalles
+                    Adoptar
                   </button>
-                  {!pet.available ? (
-                    <span className="flex-1 text-center bg-red-100 text-red-600 py-2 px-4 rounded-lg cursor-not-allowed">
-                      Ya adoptado
-                    </span>
-                  ) : hasSentRequest(pet.id) ? (
-                    <span className="flex-1 text-center bg-yellow-100 text-yellow-600 py-2 px-4 rounded-lg cursor-not-allowed">
-                      Ya enviaste solicitud
-                    </span>
-                  ) : (
-                    <button
-                      onClick={() => openAdoptionModal(pet)}
-                      className="flex-1 bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition-colors"
-                    >
-                      Adoptar
-                    </button>
-                  )}
-                </div>
+                )}
               </div>
             </div>
-          ))}
-        </div>
-      </main>
+          </div>
+        ))}
+      </div>
+    </main>
 
-      {/* Modales */}
-      <PetDetailsModal
-        isOpen={isModalOpen}
-        onClose={closeModal}
-        pet={selectedPet}
-      />
+    {/* Modales */}
+    <PetDetailsModal
+      isOpen={isModalOpen}
+      onClose={closeModal}
+      pet={selectedPet}
+    />
 
-      <AdoptionRequestModal
-        isOpen={isAdoptionModalOpen}
-        onClose={closeAdoptionModal}
-        pet={petToAdopt}
-        user={user}
-        navigate={navigate}
-      />
+    <AdoptionRequestModal
+      isOpen={isAdoptionModalOpen}
+      onClose={closeAdoptionModal}
+      pet={petToAdopt}
+      user={user}
+      navigate={navigate}
+    />
 
-      {/* Footer */}
-      <footer className="bg-[#1f2937] text-gray-300 py-4 mt-auto">
-        <div className="max-w-7xl mx-auto px-4 text-center text-sm text-gray-300">
-          © 2025 PetMatch. Todos los derechos reservados. Desarrollado por el
-          equipo de PetMatch.
-        </div>
-      </footer>
-    </div>
-  );
-};
+    {/* Footer */}
+    <footer className="bg-[#1f2937] text-gray-300 py-4">
+      <div className="max-w-7xl mx-auto px-4 text-center text-sm text-gray-300">
+        © 2025 PetMatch. Todos los derechos reservados. Desarrollado por el
+        equipo de PetMatch.
+      </div>
+    </footer>
+  </div>
+);
+}
 
 export default Dashboard;
