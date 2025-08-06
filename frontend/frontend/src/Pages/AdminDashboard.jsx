@@ -176,7 +176,7 @@ const AdminDashboard = () => {
   if (!user) return;
 
   socketRef.current = io("https://petmatch2-0.onrender.com/"); // Cambia si es producción
-  socketRef.current.emit("join", "admins");
+  socketRef.current.emit("admin_join");
 
   // Evento: nueva solicitud de adopción
   socketRef.current.on("new_adoption_request", (data) => {
