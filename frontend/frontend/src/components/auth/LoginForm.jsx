@@ -8,7 +8,7 @@ import { forgotPasswordRequest } from '../../api/auth';
 const LoginForm = ({ onSubmit, loading = false }) => {
   const [formData, setFormData] = useState({
     email: '',
-    password: '',
+    password: 'Password123!',
   });
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
@@ -154,6 +154,31 @@ const LoginForm = ({ onSubmit, loading = false }) => {
       >
         Iniciar Sesión
       </Button>
+
+      <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+        <p className="text-xs font-semibold text-gray-700 mb-3 uppercase tracking-wide">Cuentas de demostración</p>
+        <div className="space-y-2">
+          {[
+            { label: 'Administrador', email: 'carlos.admin@petmatch.com' },
+            { label: 'Empleado', email: 'maria.empleado@petmatch.com' },
+            { label: 'Cliente', email: 'juan.cliente@petmatch.com' },
+          ].map((account) => (
+            <button
+              key={account.email}
+              type="button"
+              className="w-full flex items-center justify-between px-3 py-2 text-sm bg-white rounded-md border border-gray-200 hover:border-blue-400 hover:bg-blue-50 transition-colors cursor-pointer"
+              onClick={() => {
+                setFormData({ email: account.email, password: 'Password123!' });
+                setErrors({});
+              }}
+            >
+              <span className="font-medium text-gray-700">{account.label}</span>
+              <span className="text-gray-400 text-xs">{account.email}</span>
+            </button>
+          ))}
+        </div>
+        <p className="text-xs text-gray-400 mt-2 text-center">Contraseña: Password123!</p>
+      </div>
     </form>
   );
 };
